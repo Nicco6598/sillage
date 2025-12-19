@@ -69,6 +69,8 @@ export interface Review {
     date: string;
     likes: number;
     isVerified?: boolean;
+    batchCode?: string;
+    productionDate?: string;
 }
 
 export interface FragranceCategory {

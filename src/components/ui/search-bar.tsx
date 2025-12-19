@@ -109,7 +109,7 @@ export function SearchBar({
                     className={cn(
                         "flex items-center rounded-xl border bg-bg-secondary transition-all duration-200",
                         isFocused
-                            ? "border-accent shadow-sm shadow-accent/10"
+                            ? "border-copper shadow-sm shadow-copper/10"
                             : "border-border-primary"
                     )}
                 >
@@ -185,7 +185,7 @@ export function SearchBar({
                                 setShowSuggestions(false);
                                 window.location.href = `/explore?q=${encodeURIComponent(query)}`;
                             }}
-                            className="w-full rounded-lg py-2 text-center text-sm font-medium text-accent transition-colors hover:bg-accent/5"
+                            className="w-full rounded-lg py-2 text-center text-sm font-medium text-copper transition-colors hover:bg-copper/5"
                         >
                             Vedi tutti i risultati per &quot;{query}&quot;
                         </button>

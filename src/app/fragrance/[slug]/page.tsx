@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, Star, Share2, Heart, Clock, Wind, User } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Star, Heart, Share2, Package, Calendar } from "lucide-react";
 import { getFragranceBySlug, getFragranceReviews } from "@/lib/fragrance-db";
 import { notFound } from "next/navigation";
 import { ReviewAction } from "@/components/fragrance/review-action";
+import { DynamicPerformance } from "@/components/fragrance/dynamic-performance";
+import { SeasonVotes } from "@/components/fragrance/season-votes";
 import { RecentlyViewedTracker } from "@/components/features/recently-viewed-tracker";
 import { RecentlyViewed } from "@/components/features/recently-viewed";
 
@@ -21,99 +23,160 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
     const reviews = await getFragranceReviews(fragrance.id);
 
     return (
-        <div className="w-full min-h-screen pt-40 pb-24">
+        <div className="w-full pt-32 md:pt-40 pb-24">
             <div className="container-page">
-                {/* HEADER */}
-                <div className="flex flex-col items-center text-center mb-16">
+                {/* Breadcrumb */}
+                <div className="flex items-center gap-3 mb-12">
+                    <Link
+                        href="/explore"
+                        className="flex items-center gap-2 text-sm text-text-muted hover:text-copper transition-colors"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        Esplora
+                    </Link>
+                    <span className="text-text-muted">/</span>
                     <Link
                         href={`/brands/${fragrance.brand.slug}`}
-                        className="text-xs font-mono uppercase tracking-widest text-text-muted hover:text-text-primary transition-colors mb-4"
+                        className="text-sm text-text-muted hover:text-copper transition-colors"
                     >
                         {fragrance.brand.name}
                     </Link>
-                    <h1 className="font-serif text-5xl md:text-7xl mb-4">{fragrance.name}</h1>
-                    <span className="text-lg text-text-secondary font-medium tracking-wide">
-                        {fragrance.concentration}
-                        {fragrance.year && ` • ${fragrance.year}`}
-                    </span>
                 </div>
 
-                {/* MAIN CONTENT GRID */}
-                <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
-                    {/* LEFT: VISUAL & ACTIONS */}
-                    <div className="lg:col-span-5 flex flex-col gap-8">
+                {/* MAIN GRID */}
+                <div className="grid lg:grid-cols-12 gap-12 lg:gap-16">
+
+                    {/* LEFT COLUMN: Image & Actions */}
+                    <div className="lg:col-span-5">
                         {/* Bottle Image */}
-                        <div className="aspect-[3/4] bg-bg-tertiary relative overflow-hidden flex items-center justify-center">
-                            <div className="text-9xl opacity-10 font-serif absolute">img</div>
-                            <div className="w-2/3 h-3/4 bg-gradient-to-br from-stone-100 to-stone-300 dark:from-stone-800 dark:to-stone-900 shadow-2xl z-10" />
+                        <div className="aspect-[3/4] bg-bg-secondary border border-border-primary relative overflow-hidden mb-6">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-1/2 h-2/3 bg-gradient-to-br from-bg-tertiary to-bg-secondary" />
+                            </div>
+                            {fragrance.isNew && (
+                                <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-mono uppercase tracking-wider bg-copper text-white">
+                                    Novità
+                                </span>
+                            )}
                         </div>
 
                         {/* Collection Actions */}
-                        <div className="grid grid-cols-3 gap-2">
-                            <button className="py-3 px-2 border border-border-primary hover:bg-bg-secondary text-xs uppercase tracking-widest font-medium transition-colors flex flex-col items-center gap-1 cursor-pointer">
-                                <span className="text-lg">👃</span>
-                                <span>Lo ho</span>
+                        <div className="grid grid-cols-3 gap-3 mb-6">
+                            <button className="py-4 border border-border-primary hover:border-copper hover:text-copper transition-colors flex flex-col items-center gap-2 group cursor-pointer">
+                                <span className="text-xl">👃</span>
+                                <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted group-hover:text-copper">
+                                    Lo ho
+                                </span>
                             </button>
-                            <button className="py-3 px-2 border border-border-primary hover:bg-bg-secondary text-xs uppercase tracking-widest font-medium transition-colors flex flex-col items-center gap-1 cursor-pointer">
-                                <span className="text-lg">💖</span>
-                                <span>Lo voglio</span>
+                            <button className="py-4 border border-border-primary hover:border-rose-gold hover:text-rose-gold transition-colors flex flex-col items-center gap-2 group cursor-pointer">
+                                <span className="text-xl">💖</span>
+                                <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted group-hover:text-rose-gold">
+                                    Lo voglio
+                                </span>
                             </button>
-                            <button className="py-3 px-2 border border-border-primary hover:bg-bg-secondary text-xs uppercase tracking-widest font-medium transition-colors flex flex-col items-center gap-1 cursor-pointer">
-                                <span className="text-lg">✅</span>
-                                <span>Lo avevo</span>
+                            <button className="py-4 border border-border-primary hover:border-gold hover:text-gold transition-colors flex flex-col items-center gap-2 group cursor-pointer">
+                                <span className="text-xl">✅</span>
+                                <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted group-hover:text-gold">
+                                    Lo avevo
+                                </span>
+                            </button>
+                        </div>
+
+                        {/* Secondary Actions */}
+                        <div className="flex gap-3">
+                            <button className="flex-1 py-3 border border-border-primary hover:border-copper transition-colors flex items-center justify-center gap-2 cursor-pointer text-sm text-text-secondary hover:text-copper">
+                                <Share2 className="h-4 w-4" />
+                                Condividi
+                            </button>
+                            <button className="flex-1 py-3 border border-border-primary hover:border-copper transition-colors flex items-center justify-center gap-2 cursor-pointer text-sm text-text-secondary hover:text-copper">
+                                <Heart className="h-4 w-4" />
+                                Preferiti
                             </button>
                         </div>
                     </div>
 
-                    {/* RIGHT: DATA & COMMUNITY */}
+                    {/* RIGHT COLUMN: Info */}
                     <div className="lg:col-span-7">
-                        {/* Rating Bar */}
-                        <div className="flex items-center gap-6 mb-12 p-6 bg-bg-secondary border border-border-primary">
-                            <div className="text-center px-4 border-r border-border-primary">
-                                <span className="block text-4xl font-serif">{fragrance.rating.toFixed(1)}</span>
-                                <div className="flex text-accent text-xs mt-1">
-                                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className="h-3 w-3 fill-current" />)}
-                                </div>
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
-                                    Basato su {fragrance.reviewCount.toLocaleString()} voti
-                                </p>
-                                <div className="text-sm text-text-primary font-medium">
-                                    Genere: <span className="text-text-secondary capitalize">{fragrance.gender}</span>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <button className="p-2 hover:bg-bg-tertiary rounded-full transition-colors cursor-pointer group">
-                                    <Share2 className="h-5 w-5 text-text-secondary group-hover:text-text-primary" />
-                                </button>
-                                <button className="p-2 hover:bg-bg-tertiary rounded-full transition-colors cursor-pointer group">
-                                    <Heart className="h-5 w-5 text-text-secondary group-hover:text-red-500 transition-colors" />
-                                </button>
+                        {/* Header */}
+                        <div className="mb-10">
+                            <Link
+                                href={`/brands/${fragrance.brand.slug}`}
+                                className="inline-flex items-center gap-1 text-xs font-mono uppercase tracking-widest text-text-muted hover:text-copper transition-colors mb-3"
+                            >
+                                {fragrance.brand.name}
+                                <ArrowUpRight className="h-3 w-3" />
+                            </Link>
+                            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl tracking-tight mb-4">
+                                {fragrance.name}<span className="text-copper">.</span>
+                            </h1>
+                            <div className="flex flex-wrap items-center gap-3 text-sm">
+                                <span className="px-3 py-1.5 bg-bg-tertiary border border-border-primary">
+                                    {fragrance.concentration}
+                                </span>
+                                {fragrance.year && (
+                                    <span className="px-3 py-1.5 bg-bg-tertiary border border-border-primary">
+                                        {fragrance.year}
+                                    </span>
+                                )}
+                                <span className="px-3 py-1.5 bg-bg-tertiary border border-border-primary capitalize">
+                                    {fragrance.gender}
+                                </span>
                             </div>
                         </div>
 
+                        {/* Rating Card */}
+                        <div className="p-6 bg-bg-secondary border border-border-primary mb-10">
+                            <div className="flex items-center gap-8">
+                                <div>
+                                    <span className="block font-serif text-5xl text-copper">
+                                        {fragrance.rating.toFixed(1)}
+                                    </span>
+                                    <div className="flex gap-0.5 mt-2">
+                                        {[1, 2, 3, 4, 5].map(i => (
+                                            <Star
+                                                key={i}
+                                                className={`h-4 w-4 ${i <= Math.round(fragrance.rating) ? 'text-copper fill-copper' : 'text-border-primary'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="pl-8 border-l border-border-primary">
+                                    <span className="block text-3xl font-serif">{fragrance.reviewCount.toLocaleString()}</span>
+                                    <span className="text-xs font-mono uppercase tracking-widest text-text-muted">Voti</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Dynamic Performance Stats */}
+                        <DynamicPerformance
+                            reviews={reviews}
+                            defaultSillage={fragrance.sillage}
+                            defaultLongevity={fragrance.longevity}
+                            defaultPriceValue={fragrance.priceValue}
+                        />
+
                         {/* Accords */}
                         {fragrance.accords.length > 0 && (
-                            <div className="mb-12">
-                                <h3 className="font-serif text-2xl mb-6 border-b border-border-primary pb-2">Accordi Principali</h3>
-                                <div className="space-y-3">
-                                    {fragrance.accords.map((accord) => (
-                                        <div key={accord.name} className="flex items-center gap-4">
-                                            <div className="flex-1">
-                                                <div className="flex justify-between mb-1">
-                                                    <span className="text-sm font-medium">{accord.name}</span>
-                                                    <span className="text-xs text-text-muted">{accord.percentage}%</span>
-                                                </div>
-                                                <div className="h-2 bg-bg-tertiary overflow-hidden">
-                                                    <div
-                                                        className="h-full transition-all duration-1000"
-                                                        style={{
-                                                            width: `${accord.percentage}%`,
-                                                            backgroundColor: accord.color
-                                                        }}
-                                                    />
-                                                </div>
+                            <div className="mb-10">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="w-8 h-px bg-gold" />
+                                    <h3 className="text-xs font-mono uppercase tracking-widest text-text-muted">Accordi Principali</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    {fragrance.accords.slice(0, 5).map((accord) => (
+                                        <div key={accord.name}>
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="font-serif italic capitalize text-lg">{accord.name}</span>
+                                                <span className="text-xs font-mono text-text-muted">{accord.percentage}%</span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-bg-tertiary overflow-hidden">
+                                                <div
+                                                    className="h-full transition-all duration-700"
+                                                    style={{
+                                                        width: `${accord.percentage}%`,
+                                                        backgroundColor: accord.color
+                                                    }}
+                                                />
                                             </div>
                                         </div>
                                     ))}
@@ -122,152 +185,93 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                         )}
 
                         {/* Notes Pyramid */}
-                        <div className="mb-16">
-                            <h3 className="font-serif text-2xl mb-8 border-b border-border-primary pb-2">Piramide Olfattiva</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                                <div>
-                                    <h4 className="font-mono text-xs uppercase tracking-widest text-text-muted mb-3">Testa</h4>
-                                    <ul className="space-y-1">
-                                        {fragrance.notes.top.map(n => (
-                                            <li key={n.id} className="text-sm bg-bg-secondary inline-block px-2 py-1 mr-2 mb-2 md:block md:w-full md:mr-0 md:bg-transparent md:px-0 md:py-0">
-                                                {n.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h4 className="font-mono text-xs uppercase tracking-widest text-text-muted mb-3">Cuore</h4>
-                                    <ul className="space-y-1">
-                                        {fragrance.notes.heart.map(n => (
-                                            <li key={n.id} className="text-sm bg-bg-secondary inline-block px-2 py-1 mr-2 mb-2 md:block md:w-full md:mr-0 md:bg-transparent md:px-0 md:py-0">
-                                                {n.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h4 className="font-mono text-xs uppercase tracking-widest text-text-muted mb-3">Fondo</h4>
-                                    <ul className="space-y-1">
-                                        {fragrance.notes.base.map(n => (
-                                            <li key={n.id} className="text-sm bg-bg-secondary inline-block px-2 py-1 mr-2 mb-2 md:block md:w-full md:mr-0 md:bg-transparent md:px-0 md:py-0">
-                                                {n.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                        <div className="mb-10">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-8 h-px bg-rose-gold" />
+                                <h3 className="text-xs font-mono uppercase tracking-widest text-text-muted">Piramide Olfattiva</h3>
                             </div>
-                        </div>
-
-                        {/* Community Stats */}
-                        <div className="bg-bg-secondary p-8 border border-border-primary">
-                            <h3 className="font-serif text-2xl mb-8">Statistiche Community</h3>
-
-                            <div className="space-y-8">
-                                {/* Longevity */}
-                                <div>
-                                    <div className="flex justify-between text-xs uppercase tracking-widest mb-2">
-                                        <span className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4" /> Longevità
-                                        </span>
-                                        <span>{fragrance.longevity}/5</span>
-                                    </div>
-                                    <div className="h-2 bg-text-muted/20 w-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-text-primary transition-all duration-1000"
-                                            style={{ width: `${(fragrance.longevity / 5) * 100}%` }}
-                                        />
-                                    </div>
-                                    <div className="flex justify-between text-[10px] text-text-muted mt-1 font-mono">
-                                        <span>Debole</span>
-                                        <span>Eterna</span>
-                                    </div>
-                                </div>
-
-                                {/* Sillage */}
-                                <div>
-                                    <div className="flex justify-between text-xs uppercase tracking-widest mb-2">
-                                        <span className="flex items-center gap-2">
-                                            <Wind className="h-4 w-4" /> Sillage
-                                        </span>
-                                        <span>{fragrance.sillage}/5</span>
-                                    </div>
-                                    <div className="h-2 bg-text-muted/20 w-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-text-primary transition-all duration-1000"
-                                            style={{ width: `${(fragrance.sillage / 5) * 100}%` }}
-                                        />
-                                    </div>
-                                    <div className="flex justify-between text-[10px] text-text-muted mt-1 font-mono">
-                                        <span>Intimo</span>
-                                        <span>Enorme</span>
-                                    </div>
-                                </div>
-
-                                {/* Gender */}
-                                <div>
-                                    <div className="flex justify-between text-xs uppercase tracking-widest mb-2">
-                                        <span className="flex items-center gap-2">
-                                            <User className="h-4 w-4" /> Genere
-                                        </span>
-                                        <span className="capitalize">{fragrance.gender}</span>
-                                    </div>
-                                    <div className="h-2 bg-text-muted/20 w-full overflow-hidden relative">
-                                        {/* Center marker */}
-                                        <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-bg-primary z-10" />
-                                        <div
-                                            className="h-full bg-text-primary transition-all duration-1000"
-                                            style={{
-                                                width: fragrance.gender === "masculine" ? "90%" :
-                                                    fragrance.gender === "feminine" ? "10%" : "50%"
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="flex justify-between text-[10px] text-text-muted mt-1 font-mono">
-                                        <span>Femminile</span>
-                                        <span>Unisex</span>
-                                        <span>Maschile</span>
-                                    </div>
-                                </div>
-
-                                {/* Seasons */}
-                                <div>
-                                    <div className="flex justify-between text-xs uppercase tracking-widest mb-4">
-                                        <span>Stagioni Consigliate</span>
-                                    </div>
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {[
-                                            { season: "spring", label: "Primavera", icon: "🌸" },
-                                            { season: "summer", label: "Estate", icon: "☀️" },
-                                            { season: "autumn", label: "Autunno", icon: "🍂" },
-                                            { season: "winter", label: "Inverno", icon: "❄️" },
-                                        ].map(({ season, label, icon }) => {
-                                            const isActive = fragrance.seasons.includes(season as any);
-                                            return (
-                                                <div
-                                                    key={season}
-                                                    className={`flex flex-col items-center gap-1 p-3 border transition-all ${isActive
-                                                        ? "border-text-primary bg-bg-primary"
-                                                        : "border-border-primary opacity-30"
-                                                        }`}
+                            <div className="grid grid-cols-3 gap-4">
+                                {/* Top Notes */}
+                                <div className="p-5 border border-border-primary">
+                                    <h4 className="text-xs font-mono uppercase tracking-widest text-copper mb-4 pb-3 border-b border-border-primary">
+                                        Testa
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {fragrance.notes.top.length > 0 ? (
+                                            fragrance.notes.top.map(n => (
+                                                <Link
+                                                    key={n.id}
+                                                    href={`/explore?note=${n.name}`}
+                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors"
                                                 >
-                                                    <span className="text-2xl">{icon}</span>
-                                                    <span className="text-[10px] font-mono uppercase tracking-wider text-center">
-                                                        {label}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
+                                                    {n.name}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <span className="text-sm text-text-muted">—</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Heart Notes */}
+                                <div className="p-5 border border-border-primary">
+                                    <h4 className="text-xs font-mono uppercase tracking-widest text-gold mb-4 pb-3 border-b border-border-primary">
+                                        Cuore
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {fragrance.notes.heart.length > 0 ? (
+                                            fragrance.notes.heart.map(n => (
+                                                <Link
+                                                    key={n.id}
+                                                    href={`/explore?note=${n.name}`}
+                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors"
+                                                >
+                                                    {n.name}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <span className="text-sm text-text-muted">—</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Base Notes */}
+                                <div className="p-5 border border-border-primary">
+                                    <h4 className="text-xs font-mono uppercase tracking-widest text-rose-gold mb-4 pb-3 border-b border-border-primary">
+                                        Fondo
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {fragrance.notes.base.length > 0 ? (
+                                            fragrance.notes.base.map(n => (
+                                                <Link
+                                                    key={n.id}
+                                                    href={`/explore?note=${n.name}`}
+                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors"
+                                                >
+                                                    {n.name}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <span className="text-sm text-text-muted">—</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Season Votes */}
+                        <SeasonVotes reviews={reviews} />
                     </div>
                 </div>
 
                 {/* REVIEWS SECTION */}
-                <div className="mt-24 border-t border-border-primary pt-24">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                        <h2 className="font-serif text-4xl">Recensioni ({reviews.length})</h2>
+                <div className="mt-24">
+                    <div className="flex items-center justify-between mb-10 pb-6 border-b border-border-primary">
+                        <div className="flex items-center gap-4">
+                            <div className="w-8 h-px bg-copper" />
+                            <h2 className="font-serif text-3xl md:text-4xl">Recensioni</h2>
+                            <span className="text-sm text-text-muted">({reviews.length})</span>
+                        </div>
                         <ReviewAction
                             fragranceId={fragrance.id}
                             fragranceSlug={fragrance.slug}
@@ -276,32 +280,38 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                     </div>
 
                     {reviews.length === 0 ? (
-                        <div className="text-center py-12 bg-bg-secondary border border-border-primary">
+                        <div className="text-center py-16 bg-bg-secondary border border-border-primary">
                             <p className="text-text-secondary mb-4">Nessuna recensione ancora.</p>
-                            <p className="font-serif text-xl">Sii il primo a dire la tua su {fragrance.name}!</p>
+                            <p className="font-serif text-2xl">Sii il primo a recensire {fragrance.name}!</p>
                         </div>
                     ) : (
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             {reviews.map((review) => (
-                                <div key={review.id} className="border-b border-border-primary pb-8">
+                                <div key={review.id} className="border border-border-primary p-6 hover:border-copper/30 transition-colors">
+                                    {/* Review Header */}
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-full bg-bg-tertiary flex items-center justify-center text-xl uppercase font-serif">
+                                            <div className="w-12 h-12 bg-bg-tertiary border border-border-primary flex items-center justify-center text-xl uppercase font-serif">
                                                 {review.userName.charAt(0)}
                                             </div>
                                             <div>
                                                 <p className="font-medium">{review.userName}</p>
                                                 <p className="text-xs text-text-muted font-mono">
-                                                    {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ""}
+                                                    {review.createdAt ? new Date(review.createdAt).toLocaleDateString('it-IT', {
+                                                        day: 'numeric',
+                                                        month: 'long',
+                                                        year: 'numeric'
+                                                    }) : ""}
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-1">
+                                            <span className="font-serif text-xl text-copper mr-2">{Number(review.rating).toFixed(1)}</span>
                                             {[1, 2, 3, 4, 5].map((i) => (
                                                 <Star
                                                     key={i}
-                                                    className={`h-4 w-4 ${i <= (review.rating || 0)
-                                                        ? "fill-current text-accent"
+                                                    className={`h-4 w-4 ${i <= Math.round(Number(review.rating) || 0)
+                                                        ? "fill-copper text-copper"
                                                         : "text-border-primary"
                                                         }`}
                                                 />
@@ -309,36 +319,59 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                                         </div>
                                     </div>
 
+                                    {/* Batch Info */}
+                                    {(review.batchCode || review.productionDate) && (
+                                        <div className="flex items-center gap-4 mb-4 p-3 bg-bg-tertiary/50 border border-border-primary">
+                                            {review.batchCode && (
+                                                <div className="flex items-center gap-2">
+                                                    <Package className="h-4 w-4 text-gold" />
+                                                    <span className="text-xs font-mono uppercase tracking-wider">
+                                                        Batch: <span className="text-text-primary">{review.batchCode}</span>
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {review.productionDate && (
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="h-4 w-4 text-rose-gold" />
+                                                    <span className="text-xs font-mono uppercase tracking-wider">
+                                                        Prod: <span className="text-text-primary">{review.productionDate}</span>
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Comment */}
                                     {review.comment && (
-                                        <p className="text-text-secondary leading-relaxed mb-4">
-                                            {review.comment}
+                                        <p className="text-text-secondary leading-relaxed mb-6">
+                                            "{review.comment}"
                                         </p>
                                     )}
 
                                     {/* Detailed Ratings */}
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-bg-secondary">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         {review.sillage && (
-                                            <div className="text-center">
-                                                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">Sillage</p>
-                                                <p className="text-lg font-mono">{review.sillage}/5</p>
+                                            <div className="p-3 bg-bg-secondary text-center">
+                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Sillage</p>
+                                                <p className="text-lg font-mono text-copper">{review.sillage}<span className="text-text-muted text-sm">/5</span></p>
                                             </div>
                                         )}
                                         {review.longevity && (
-                                            <div className="text-center">
-                                                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">Longevità</p>
-                                                <p className="text-lg font-mono">{review.longevity}/5</p>
+                                            <div className="p-3 bg-bg-secondary text-center">
+                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Longevità</p>
+                                                <p className="text-lg font-mono text-gold">{review.longevity}<span className="text-text-muted text-sm">/5</span></p>
                                             </div>
                                         )}
                                         {review.genderVote && (
-                                            <div className="text-center">
-                                                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">Genere</p>
+                                            <div className="p-3 bg-bg-secondary text-center">
+                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Genere</p>
                                                 <p className="text-sm capitalize">{review.genderVote}</p>
                                             </div>
                                         )}
                                         {review.seasonVote && (
-                                            <div className="text-center">
-                                                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">Stagione</p>
-                                                <p className="text-sm capitalize">{review.seasonVote}</p>
+                                            <div className="p-3 bg-bg-secondary text-center">
+                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Stagione</p>
+                                                <p className="text-sm capitalize">{review.seasonVote.replace(/,/g, ', ')}</p>
                                             </div>
                                         )}
                                     </div>
@@ -346,14 +379,6 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                             ))}
                         </div>
                     )}
-                </div>
-
-                {/* Load More */}
-                <div className="mt-12 text-center">
-                    <button className="group flex items-center gap-4 text-sm uppercase tracking-widest border-b border-text-primary pb-1 hover:text-text-secondary transition-colors mx-auto cursor-pointer">
-                        Carica altre recensioni
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </button>
                 </div>
             </div>
 

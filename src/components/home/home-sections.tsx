@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FragranceCard } from "@/components/fragrance/fragrance-card";
 import type { Fragrance } from "@/types/fragrance";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ export function FeaturedFragrances({ fragrances }: FeaturedFragrancesProps) {
 
                     <Link
                         href="/explore"
-                        className="group flex items-center gap-1 text-sm font-medium text-accent"
+                        className="group flex items-center gap-1 text-sm font-medium text-copper"
                     >
                         Vedi tutte
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -73,11 +73,11 @@ export function CategoriesSection() {
                             href={cat.href}
                             className={cn(
                                 "group flex flex-col items-center gap-2 rounded-xl border border-border-primary bg-bg-primary p-6 text-center",
-                                "transition-all duration-200 hover:border-accent hover:shadow-sm"
+                                "transition-all duration-200 hover:border-copper hover:shadow-sm"
                             )}
                         >
                             <span className="text-3xl">{cat.icon}</span>
-                            <span className="font-medium text-text-primary group-hover:text-accent">
+                            <span className="font-medium text-text-primary group-hover:text-copper">
                                 {cat.name}
                             </span>
                             <span className="text-xs text-text-muted">{cat.count.toLocaleString()}</span>
@@ -109,7 +109,7 @@ export function TopBrandsSection() {
                     <h2 className="text-2xl font-semibold text-text-primary">Top brand</h2>
                     <Link
                         href="/brands"
-                        className="group flex items-center gap-1 text-sm font-medium text-accent"
+                        className="group flex items-center gap-1 text-sm font-medium text-copper"
                     >
                         Tutti
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -123,7 +123,7 @@ export function TopBrandsSection() {
                             href={`/brands/${brand.name.toLowerCase().replace(/\s+/g, "-")}`}
                             className={cn(
                                 "flex flex-col items-center gap-2 rounded-xl border border-border-primary p-4",
-                                "transition-all duration-200 hover:border-accent hover:shadow-sm"
+                                "transition-all duration-200 hover:border-copper hover:shadow-sm"
                             )}
                         >
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-tertiary text-lg font-semibold text-text-secondary">
@@ -160,7 +160,7 @@ export function PopularNotesSection() {
                         <Link
                             key={note}
                             href={`/notes/${note.toLowerCase()}`}
-                            className="rounded-full border border-border-primary bg-bg-primary px-4 py-2 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
+                            className="rounded-full border border-border-primary bg-bg-primary px-4 py-2 text-sm text-text-secondary transition-colors hover:border-copper hover:text-copper"
                         >
                             {note}
                         </Link>
@@ -178,7 +178,7 @@ export function CTASection() {
     return (
         <section className="py-20">
             <div className="container-page">
-                <div className="rounded-2xl bg-gradient-to-r from-accent to-accent-secondary p-8 text-center md:p-12">
+                <div className="rounded-2xl bg-gradient-to-r from-copper to-rose-gold p-8 text-center md:p-12">
                     <h2 className="text-2xl font-semibold text-white md:text-3xl">
                         Unisciti alla community
                     </h2>
@@ -194,7 +194,7 @@ export function CTASection() {
                         />
                         <button
                             type="submit"
-                            className="h-11 rounded-lg bg-white px-6 text-sm font-medium text-accent transition-colors hover:bg-white/90"
+                            className="h-11 rounded-lg bg-white px-6 text-sm font-medium text-copper transition-colors hover:bg-white/90"
                         >
                             Iscriviti
                         </button>

@@ -1,10 +1,9 @@
 "use client";
 
-
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { surpriseMe } from "@/app/actions/discovery";
-import { Search, Heart, User, Menu, X, Sparkles } from "lucide-react";
+import { Search, Heart, Menu, X, Sparkles, ArrowUpRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
@@ -23,8 +22,7 @@ const navItems: NavItem[] = [
 ];
 
 /**
- * Ultra-Minimal Navbar - 2025 Complete Rework
- * Clean, spacious, search in mobile menu
+ * Navbar - 2025 Design aligned with Stone & Silk aesthetic
  */
 export function Navbar() {
     const router = useRouter();
@@ -41,6 +39,18 @@ export function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Lock body scroll when mobile menu is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [isMobileMenuOpen]);
+
     const handleMobileSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (mobileSearchQuery.trim()) {
@@ -56,20 +66,22 @@ export function Navbar() {
                 className={cn(
                     "fixed left-0 right-0 top-0 z-50 transition-all duration-300",
                     isScrolled
-                        ? "bg-bg-primary/80 backdrop-blur-md border-b border-border-primary shadow-sm py-2"
-                        : "bg-transparent py-4"
+                        ? "bg-bg-primary/90 backdrop-blur-md border-b border-border-primary"
+                        : "bg-transparent"
                 )}
             >
-                <div className="container-page px-5 md:px-6 lg:px-8">
-                    <div className="flex items-center justify-between">
+                <div className="container-page">
+                    <div className={cn(
+                        "flex items-center justify-between transition-all duration-300",
+                        isScrolled ? "h-16" : "h-20"
+                    )}>
                         {/* Logo */}
-                        <Link href="/" className="z-50 relative">
-                            <Logo size="md" className="lg:hidden text-text-primary" />
-                            <Logo size="lg" className="hidden lg:block text-text-primary" />
+                        <Link href="/" className="relative z-50">
+                            <Logo size="md" className="text-text-primary" />
                         </Link>
 
-                        {/* Desktop Navigation */}
-                        <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+                        {/* Desktop Navigation - Centered */}
+                        <nav className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href;
                                 return (
@@ -79,13 +91,13 @@ export function Navbar() {
                                         className="relative group py-2"
                                     >
                                         <span className={cn(
-                                            "text-[13px] font-medium tracking-wide transition-colors uppercase",
-                                            isActive ? "text-text-primary" : "text-text-secondary hover:text-text-primary"
+                                            "text-sm tracking-wide transition-colors",
+                                            isActive ? "text-copper" : "text-text-secondary hover:text-text-primary"
                                         )}>
                                             {item.label}
                                         </span>
                                         <span className={cn(
-                                            "absolute bottom-0 left-0 h-[1px] bg-text-primary transition-all duration-300",
+                                            "absolute bottom-0 left-0 h-px bg-copper transition-all duration-300",
                                             isActive ? "w-full" : "w-0 group-hover:w-full"
                                         )} />
                                     </Link>
@@ -94,39 +106,38 @@ export function Navbar() {
                         </nav>
 
                         {/* Desktop Actions */}
-                        <div className="hidden lg:flex items-center gap-1">
+                        <div className="hidden lg:flex items-center gap-2">
                             <Link
                                 href="/explore"
-                                className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-secondary rounded-full transition-all"
-                                aria-label="Search"
+                                className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+                                aria-label="Cerca"
                             >
                                 <Search className="h-[18px] w-[18px]" />
                             </Link>
 
                             <Link
                                 href="/favorites"
-                                className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-secondary rounded-full transition-all"
-                                aria-label="Favorites"
+                                className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+                                aria-label="Preferiti"
                             >
                                 <Heart className="h-[18px] w-[18px]" />
                             </Link>
 
                             <button
                                 onClick={() => surpriseMe()}
-                                className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-secondary rounded-full transition-all group cursor-pointer"
+                                className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold hover:bg-bg-tertiary transition-colors cursor-pointer"
                                 aria-label="Sorprendimi"
-                                title="Sorprendimi"
                             >
-                                <Sparkles className="h-[18px] w-[18px] group-hover:text-accent transition-colors" />
+                                <Sparkles className="h-[18px] w-[18px]" />
                             </button>
 
-                            <div className="mx-1 pl-1 border-l border-border-primary">
-                                <ThemeToggle />
-                            </div>
+                            <div className="w-px h-5 bg-border-primary mx-2" />
+
+                            <ThemeToggle />
 
                             <Link
                                 href="/login"
-                                className="ml-4 text-xs font-medium uppercase tracking-widest border border-text-primary px-4 py-2 hover:bg-text-primary hover:text-bg-primary transition-colors"
+                                className="ml-4 px-5 py-2 text-xs uppercase tracking-widest border border-text-primary text-text-primary hover:bg-text-primary hover:text-text-inverted transition-colors"
                             >
                                 Accedi
                             </Link>
@@ -135,102 +146,117 @@ export function Navbar() {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden p-2 text-text-primary hover:bg-bg-secondary rounded-md"
+                            className="lg:hidden w-10 h-10 flex items-center justify-center text-text-primary"
                             aria-label="Menu"
                         >
-                            <Menu className="h-6 w-6" />
+                            <Menu className="h-5 w-5" />
                         </button>
                     </div>
                 </div>
             </header>
 
-            {/* Mobile Menu - Modern Full Screen with Staggered Animation */}
+            {/* Mobile Menu - Full Screen Overlay */}
             <div
                 className={cn(
-                    "fixed inset-0 z-[100] bg-bg-primary/95 backdrop-blur-xl transition-all duration-500 lg:hidden flex flex-col",
-                    isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
+                    "fixed inset-0 z-[100] lg:hidden transition-opacity duration-300",
+                    isMobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                 )}
             >
-                {/* Mobile Header */}
-                <div className="flex items-center justify-between p-5 border-b border-border-primary">
-                    <Logo size="md" />
-                    <button
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="p-2 text-text-primary hover:bg-bg-secondary rounded-full transition-colors cursor-pointer"
-                        aria-label="Close"
-                    >
-                        <X className="h-6 w-6" />
-                    </button>
-                </div>
+                {/* Backdrop */}
+                <div
+                    className="absolute inset-0 bg-bg-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
 
-                {/* Mobile Search - Prominent */}
-                <div className="p-5">
-                    <form onSubmit={handleMobileSearch} className="relative group">
-                        <input
-                            type="text"
-                            value={mobileSearchQuery}
-                            onChange={(e) => setMobileSearchQuery(e.target.value)}
-                            placeholder="Cerca una fragranza..."
-                            className="w-full bg-transparent border-b-2 border-border-primary py-4 text-2xl font-serif text-text-primary placeholder:text-text-muted/50 outline-none focus:border-text-primary transition-colors pr-10"
-                            autoFocus={isMobileMenuOpen}
-                        />
+                {/* Menu Content */}
+                <div className={cn(
+                    "relative h-full flex flex-col bg-bg-primary transition-transform duration-500",
+                    isMobileMenuOpen ? "translate-y-0" : "-translate-y-8"
+                )}>
+                    {/* Mobile Header */}
+                    <div className="flex items-center justify-between px-6 h-16 border-b border-border-primary">
+                        <Logo size="md" className="text-text-primary" />
                         <button
-                            type="submit"
-                            className="absolute right-0 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-text-primary transition-colors p-2"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="w-10 h-10 flex items-center justify-center text-text-primary hover:bg-bg-tertiary transition-colors"
+                            aria-label="Chiudi"
                         >
-                            <Search className="h-6 w-6" />
+                            <X className="h-5 w-5" />
                         </button>
-                    </form>
-                </div>
+                    </div>
 
-                {/* Navigation Links - Large & Animated */}
-                <nav className="flex-1 flex flex-col px-5 py-4 gap-6 overflow-y-auto">
-                    {[
-                        { label: "Home", href: "/" },
-                        ...navItems
-                    ].map((item, index) => {
-                        const isActive = pathname === item.href;
-                        const number = (index + 1).toString().padStart(2, '0');
-
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className={cn(
-                                    "group flex items-baseline gap-4 text-4xl sm:text-5xl font-serif tracking-tight transition-all duration-300 transform translate-y-0 hover:translate-x-4",
-                                    isActive ? "text-text-primary italic" : "text-text-secondary hover:text-text-primary",
-                                    isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                                )}
-                                style={{ transitionDelay: `${100 + index * 50}ms` }}
+                    {/* Mobile Search */}
+                    <div className="px-6 py-6 border-b border-border-primary">
+                        <form onSubmit={handleMobileSearch} className="relative">
+                            <div className="absolute inset-0 bg-bg-tertiary/50 -z-10 border border-border-primary" />
+                            <input
+                                type="text"
+                                value={mobileSearchQuery}
+                                onChange={(e) => setMobileSearchQuery(e.target.value)}
+                                placeholder="Cerca fragranze..."
+                                className="w-full bg-transparent px-4 py-3 pr-12 text-base placeholder:text-text-muted outline-none"
+                            />
+                            <button
+                                type="submit"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-text-muted"
                             >
-                                <span className={cn(
-                                    "text-sm font-mono tracking-widest -mb-2",
-                                    isActive ? "text-accent" : "text-text-muted group-hover:text-accent transition-colors"
-                                )}>
-                                    {number}
-                                </span>
-                                <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
+                                <Search className="h-4 w-4" />
+                            </button>
+                        </form>
+                    </div>
 
-                {/* Mobile Footer Gradient Overlay */}
-                <div className="p-5 border-t border-border-primary bg-gradient-to-t from-bg-secondary/50 to-transparent backdrop-blur-sm">
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-start gap-6">
-                            <ThemeToggle />
+                    {/* Navigation Links */}
+                    <nav className="flex-1 overflow-y-auto px-6 py-8">
+                        <div className="space-y-2">
+                            {[{ label: "Home", href: "/" }, ...navItems].map((item, index) => {
+                                const isActive = pathname === item.href;
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className={cn(
+                                            "group flex items-center justify-between py-4 border-b border-border-secondary/50 transition-colors",
+                                            isActive ? "border-copper" : "hover:border-copper"
+                                        )}
+                                    >
+                                        <div className="flex items-baseline gap-4">
+                                            <span className={cn(
+                                                "text-xs font-mono",
+                                                isActive ? "text-copper" : "text-text-muted"
+                                            )}>
+                                                0{index + 1}
+                                            </span>
+                                            <span className={cn(
+                                                "font-serif text-2xl transition-colors",
+                                                isActive ? "text-copper" : "text-text-primary group-hover:text-copper"
+                                            )}>
+                                                {item.label}
+                                            </span>
+                                        </div>
+                                        <ArrowUpRight className={cn(
+                                            "h-4 w-4 transition-all",
+                                            isActive
+                                                ? "text-copper opacity-100"
+                                                : "text-text-muted opacity-0 group-hover:opacity-100 group-hover:text-copper"
+                                        )} />
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </nav>
 
+                    {/* Mobile Footer */}
+                    <div className="px-6 py-6 border-t border-border-primary bg-bg-secondary/30">
+                        {/* Actions Row */}
+                        <div className="flex items-center gap-4 mb-6">
                             <Link
                                 href="/favorites"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="group flex flex-col items-center gap-1"
+                                className="flex-1 flex items-center justify-center gap-2 py-3 border border-border-primary text-sm hover:border-copper hover:text-copper transition-colors"
                             >
-                                <div className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-bg-secondary transition-colors">
-                                    <Heart className="h-4 w-4 text-text-secondary group-hover:text-text-primary transition-colors" />
-                                </div>
-                                <span className="text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity text-text-primary absolute -bottom-4">Saved</span>
+                                <Heart className="h-4 w-4" />
+                                <span>Preferiti</span>
                             </Link>
 
                             <button
@@ -238,23 +264,24 @@ export function Navbar() {
                                     setIsMobileMenuOpen(false);
                                     surpriseMe();
                                 }}
-                                className="group flex flex-col items-center gap-1 cursor-pointer"
+                                className="flex-1 flex items-center justify-center gap-2 py-3 border border-border-primary text-sm hover:border-gold hover:text-gold transition-colors cursor-pointer"
                             >
-                                <div className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-bg-secondary transition-colors">
-                                    <Sparkles className="h-4 w-4 text-text-secondary group-hover:text-accent transition-colors" />
-                                </div>
-                                <span className="text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity text-text-primary absolute -bottom-4">Random</span>
+                                <Sparkles className="h-4 w-4" />
+                                <span>Random</span>
                             </button>
-                        </div>
-                    </div>
 
-                    <Link
-                        href="/login"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex w-full items-center justify-center gap-3 py-4 border border-text-primary text-sm font-medium uppercase tracking-widest hover:bg-text-primary hover:text-bg-primary transition-all"
-                    >
-                        Accedi al Profilo
-                    </Link>
+                            <ThemeToggle />
+                        </div>
+
+                        {/* Login Button */}
+                        <Link
+                            href="/login"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex w-full items-center justify-center py-4 bg-text-primary text-text-inverted text-sm uppercase tracking-widest hover:bg-copper transition-colors"
+                        >
+                            Accedi
+                        </Link>
+                    </div>
                 </div>
             </div>
         </>

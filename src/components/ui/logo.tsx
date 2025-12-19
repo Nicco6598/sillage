@@ -11,15 +11,15 @@ interface LogoProps {
  */
 export function Logo({ className, size = "md" }: LogoProps) {
     const sizeClasses = {
-        sm: "h-32",      // 32px
-        md: "h-36",     // 48px
-        lg: "h-42",     // 64px
-        xl: "h-48",     // 96px
+        sm: "h-6",      // ~24px
+        md: "h-8",      // ~32px
+        lg: "h-10",     // ~40px
+        xl: "h-14",     // ~56px
     };
 
     return (
         <svg
-            viewBox="0 0 1024 1024"
+            viewBox="250 390 510 230"
             className={cn(sizeClasses[size], "w-auto", className)}
             fill="currentColor"
             aria-label="Sillage Logo"

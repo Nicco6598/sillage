@@ -1,16 +1,16 @@
 
 import { db } from "./db";
 import { fragrances, brands, fragranceNotes, fragranceAccords, notes, reviews } from "./db-schema";
-import { eq, ilike, and, desc, sql, inArray, count } from "drizzle-orm";
+import { eq, ilike, and, desc, inArray, count } from "drizzle-orm";
 import type { Fragrance } from "@/types/fragrance";
 
 /**
  * Helper to transform DB result to Fragrance type
  */
 function transformToFragrance(curr: any): Fragrance {
-    const topNotes = curr.notes.filter(n => n.type === 'top' && n.note).map(n => ({ id: n.note!.id, name: n.note!.name, type: 'top' as const }));
-    const heartNotes = curr.notes.filter(n => n.type === 'heart' && n.note).map(n => ({ id: n.note!.id, name: n.note!.name, type: 'heart' as const }));
-    const baseNotes = curr.notes.filter(n => n.type === 'base' && n.note).map(n => ({ id: n.note!.id, name: n.note!.name, type: 'base' as const }));
+    const topNotes = curr.notes.filter((n: any) => n.type === 'top' && n.note).map((n: any) => ({ id: n.note!.id, name: n.note!.name, type: 'top' as const }));
+    const heartNotes = curr.notes.filter((n: any) => n.type === 'heart' && n.note).map((n: any) => ({ id: n.note!.id, name: n.note!.name, type: 'heart' as const }));
+    const baseNotes = curr.notes.filter((n: any) => n.type === 'base' && n.note).map((n: any) => ({ id: n.note!.id, name: n.note!.name, type: 'base' as const }));
 
     // Ensure brand exists (it should due to foreign key, but TS doesn't know)
     const brand = curr.brand || { id: "unknown", name: "Unknown", slug: "unknown", country: null };
@@ -36,14 +36,14 @@ function transformToFragrance(curr: any): Fragrance {
             heart: heartNotes,
             base: baseNotes,
         },
-        accords: curr.accords.map(a => ({
+        accords: curr.accords.map((a: any) => ({
             name: a.name,
             percentage: a.percentage || 0,
             color: a.color || "#cccccc"
-        })).sort((a, b) => b.percentage - a.percentage),
-        sillage: Number(curr.sillageRating || 3),
-        longevity: Number(curr.longevityRating || 3),
-        priceValue: Number(curr.priceValueRating || 3),
+        })).sort((a: any, b: any) => b.percentage - a.percentage),
+        sillage: Math.min(5, Math.max(1, Math.round(Number(curr.sillageRating || 3)))) as 1 | 2 | 3 | 4 | 5,
+        longevity: Math.min(5, Math.max(1, Math.round(Number(curr.longevityRating || 3)))) as 1 | 2 | 3 | 4 | 5,
+        priceValue: Math.min(5, Math.max(1, Math.round(Number(curr.priceValueRating || 3)))) as 1 | 2 | 3 | 4 | 5,
         seasons: ["spring", "autumn"], // Default for now
         occasions: ["daily"],
         isFeatured: (Number(curr.rating) >= 4.0 && (curr.reviewCount || 0) > 100),
@@ -93,6 +93,7 @@ export async function getFeaturedFragrances(limit = 8): Promise<Fragrance[]> {
 
     return results.map(transformToFragrance);
 }
+
 
 /**
  * Search fragrances (Supabase / DB version)
@@ -322,3 +323,51 @@ export async function getDatabaseStats() {
         notes: notesCount[0].count
     };
 }
+
+/**
+ * Get all brands with fragrance count
+ */
+export async function getAllBrandsWithCount(): Promise<{
+    id: string;
+    name: string;
+    slug: string;
+    country: string | null;
+    fragranceCount: number;
+}[]> {
+    // Get all brands
+    const allBrands = await db.query.brands.findMany({
+        orderBy: brands.name,
+        with: {
+            fragrances: {
+                columns: { id: true }
+            }
+        }
+    });
+
+    return allBrands.map(b => ({
+        id: b.id,
+        name: b.name,
+        slug: b.slug,
+        country: b.country,
+        fragranceCount: b.fragrances?.length || 0
+    }));
+}
+
+/**
+ * Get featured brands (brands with most fragrances)
+ */
+export async function getFeaturedBrands(limit = 4): Promise<{
+    id: string;
+    name: string;
+    slug: string;
+    country: string | null;
+    fragranceCount: number;
+}[]> {
+    const allBrands = await getAllBrandsWithCount();
+
+    // Sort by fragrance count descending
+    return allBrands
+        .sort((a, b) => b.fragranceCount - a.fragranceCount)
+        .slice(0, limit);
+}
+

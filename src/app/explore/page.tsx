@@ -1,4 +1,3 @@
-
 import { Suspense } from "react";
 import { searchFragrances, getTopBrands, getUniqueAccords, getUniqueNotes, getDatabaseStats } from "@/lib/fragrance-db";
 import { ExploreContent } from "./explore-content";
@@ -44,53 +43,73 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
             limit,
             offset,
         }),
-        getTopBrands(3000), // Load all brands (approx 1000 currently)
+        getTopBrands(3000),
         getUniqueAccords(),
         getUniqueNotes(),
         getDatabaseStats()
     ]);
 
-    return (
-        <main className="w-full pt-40 pb-24">
-            <div className="container-page">
-                {/* Header */}
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16 border-b border-border-primary pb-8">
-                    <div>
-                        <h1 className="font-serif text-5xl md:text-7xl mb-4">Esplora.</h1>
-                        <p className="text-text-secondary text-lg max-w-md">
-                            {result.total !== stats.fragrances ? (
-                                <>
-                                    Trovate <span className="font-semibold text-text-primary">{result.total.toLocaleString()}</span> fragranze su {stats.fragrances.toLocaleString()}.
-                                </>
-                            ) : (
-                                "Cerca tra migliaia di profumi, note e accordi."
-                            )}
-                        </p>
-                    </div>
+    // Check if any filters are active
+    const hasFilters = !!(gender || brand || note || accord || query);
 
-                    <div className="grid grid-cols-3 gap-6 md:gap-12 pb-2 w-full md:w-auto">
-                        <div className="bg-bg-secondary p-4 text-center border border-border-primary min-w-[100px]">
-                            <span className="block text-xl md:text-2xl font-serif mb-1">{stats.fragrances.toLocaleString()}</span>
-                            <span className="text-[10px] uppercase tracking-widest text-text-muted block">Fragranze</span>
-                        </div>
-                        <div className="bg-bg-secondary p-4 text-center border border-border-primary min-w-[100px]">
-                            <span className="block text-xl md:text-2xl font-serif mb-1">{stats.brands.toLocaleString()}</span>
-                            <span className="text-[10px] uppercase tracking-widest text-text-muted block">Brand</span>
-                        </div>
-                        <div className="bg-bg-secondary p-4 text-center border border-border-primary min-w-[100px]">
-                            <span className="block text-xl md:text-2xl font-serif mb-1">{stats.notes.toLocaleString()}</span>
-                            <span className="text-[10px] uppercase tracking-widest text-text-muted block">Note</span>
+    return (
+        <main className="w-full pt-32 md:pt-40 pb-24">
+            <div className="container-page">
+                {/* Hero Header */}
+                <div className="mb-16 md:mb-24">
+                    <div className="relative">
+                        <div className="flex flex-col gap-8">
+                            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
+                                <div className="space-y-4">
+                                    <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl tracking-tight">
+                                        Esplora<span className="text-copper">.</span>
+                                    </h1>
+                                    <p className="max-w-lg text-lg text-text-secondary leading-relaxed">
+                                        {hasFilters ? (
+                                            <>
+                                                Trovate <span className="font-semibold text-copper">{result.total.toLocaleString()}</span> fragranze
+                                                {result.total !== stats.fragrances && ` su ${stats.fragrances.toLocaleString()}`}
+                                            </>
+                                        ) : (
+                                            "Cerca tra migliaia di profumi, note olfattive e accordi unici."
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Stats Bar */}
+                            <div className="flex flex-wrap gap-8 pt-8 border-t border-border-primary">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="font-serif text-3xl text-copper">{stats.fragrances.toLocaleString()}</span>
+                                    <span className="text-sm text-text-muted uppercase tracking-wide">Fragranze</span>
+                                </div>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="font-serif text-3xl text-gold">{stats.brands.toLocaleString()}</span>
+                                    <span className="text-sm text-text-muted uppercase tracking-wide">Brand</span>
+                                </div>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="font-serif text-3xl text-rose-gold">{stats.notes.toLocaleString()}</span>
+                                    <span className="text-sm text-text-muted uppercase tracking-wide">Note</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <Suspense
                     fallback={
-                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                            {Array.from({ length: 18 }).map((_, i) => (
-                                <FragranceCardSkeleton key={i} variant="compact" />
-                            ))}
+                        <div className="space-y-8">
+                            {/* Search skeleton */}
+                            <div className="flex justify-between items-center pb-8 border-b border-border-primary">
+                                <div className="h-10 w-80 bg-bg-tertiary animate-pulse" />
+                                <div className="h-10 w-24 bg-bg-tertiary animate-pulse" />
+                            </div>
+                            {/* Cards skeleton */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
+                                {Array.from({ length: 12 }).map((_, i) => (
+                                    <FragranceCardSkeleton key={i} variant="compact" />
+                                ))}
+                            </div>
                         </div>
                     }
                 >

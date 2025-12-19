@@ -27,7 +27,7 @@ export function ThemeToggle() {
             className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-lg",
                 "text-text-tertiary transition-colors duration-200",
-                "hover:bg-bg-tertiary hover:text-text-primary"
+                "hover:bg-bg-tertiary hover:text-gold"
             )}
             aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`}
         >

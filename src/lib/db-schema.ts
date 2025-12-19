@@ -1,5 +1,5 @@
 
-import { pgTable, uuid, text, integer, numeric, timestamp, check, unique, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, numeric, timestamp, unique, index } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // --- BRANDS ---
@@ -104,12 +104,14 @@ export const reviews = pgTable('reviews', {
     id: uuid('id').defaultRandom().primaryKey(),
     fragranceId: uuid('fragrance_id').references(() => fragrances.id, { onDelete: 'cascade' }),
     userName: text('user_name').notNull(),
-    rating: integer('rating'), // 1-5
+    rating: numeric('rating', { precision: 4, scale: 2 }), // 1-5
     comment: text('comment'),
-    longevity: integer('longevity'), // 1-5
-    sillage: integer('sillage'), // 1-5
+    longevity: numeric('longevity', { precision: 3, scale: 1 }), // 1-5
+    sillage: numeric('sillage', { precision: 3, scale: 1 }), // 1-5
     genderVote: text('gender_vote'),
     seasonVote: text('season_vote'),
+    batchCode: text('batch_code'),
+    productionDate: text('production_date'),
     createdAt: timestamp('created_at').defaultNow(),
 });
 

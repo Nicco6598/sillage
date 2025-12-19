@@ -226,6 +226,27 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                 </div>
                             </div>
 
+                            {/* Batch & Production Date */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
+                                <div>
+                                    <label className="block text-xs uppercase tracking-widest text-text-muted mb-3">Codice Batch (Opzionale)</label>
+                                    <input
+                                        name="batchCode"
+                                        className="w-full bg-bg-secondary border border-border-primary p-4 outline-none focus:border-text-primary transition-colors text-sm font-mono placeholder:text-text-muted/50"
+                                        placeholder="Es. A42, 22S11..."
+                                    />
+                                    <p className="text-[10px] text-text-muted mt-2">Utile per tracciare le riformulazioni.</p>
+                                </div>
+                                <div>
+                                    <label className="block text-xs uppercase tracking-widest text-text-muted mb-3">Data di Produzione (Opzionale)</label>
+                                    <input
+                                        type="month"
+                                        name="productionDate"
+                                        className="w-full bg-bg-secondary border border-border-primary p-4 outline-none focus:border-text-primary transition-colors text-sm font-mono placeholder:text-text-muted/50"
+                                    />
+                                </div>
+                            </div>
+
                             <div className="pt-4">
                                 <button
                                     disabled={isPending}

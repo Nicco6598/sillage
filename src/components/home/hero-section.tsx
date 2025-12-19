@@ -13,21 +13,21 @@ export function HeroSection() {
         <section className="relative min-h-[80vh] overflow-hidden bg-bg-primary pt-24">
             {/* Subtle Background Gradient */}
             <div className="pointer-events-none absolute inset-0">
-                <div className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-3xl" />
+                <div className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-rose-gold/10 blur-3xl" />
             </div>
 
             {/* Content */}
             <div className="container-page relative z-10 flex min-h-[70vh] flex-col items-center justify-center py-16 text-center">
                 {/* Badge */}
-                <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-sm text-accent">
-                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-copper/20 bg-copper/5 px-3 py-1 text-sm text-copper">
+                    <span className="h-1.5 w-1.5 rounded-full bg-copper" />
                     15,000+ fragranze
                 </div>
 
                 {/* Heading */}
                 <h1 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight text-text-primary sm:text-5xl md:text-6xl">
                     Trova il tuo{" "}
-                    <span className="text-accent">profumo</span>
+                    <span className="text-copper italic font-serif">profumo</span>
                 </h1>
 
                 {/* Subheading */}
@@ -47,7 +47,7 @@ export function HeroSection() {
                         <Link
                             key={name}
                             href={`/search?q=${encodeURIComponent(name)}`}
-                            className="rounded-full border border-border-primary px-3 py-1 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
+                            className="rounded-full border border-border-primary px-3 py-1 text-sm text-text-secondary transition-colors hover:border-copper hover:text-copper"
                         >
                             {name}
                         </Link>
@@ -60,8 +60,8 @@ export function HeroSection() {
                         href="/explore"
                         className={cn(
                             "group inline-flex h-11 items-center gap-2 rounded-xl px-6",
-                            "bg-accent text-sm font-medium text-white",
-                            "transition-all hover:bg-accent-hover"
+                            "bg-copper text-sm font-medium text-white",
+                            "transition-all hover:bg-copper/90 hover:scale-105"
                         )}
                     >
                         Esplora

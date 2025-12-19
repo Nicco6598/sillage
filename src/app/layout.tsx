@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { RouteChangeLoader } from "@/components/ui/perfume-loader";
 import "./globals.css";
 
 const inter = Inter({
@@ -90,6 +91,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} min-h-screen bg-bg-primary font-sans text-text-primary antialiased`}
       >
+        <RouteChangeLoader />
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />
