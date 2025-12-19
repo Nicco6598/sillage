@@ -1,102 +1,35 @@
 import Link from "next/link";
-import { Github, Twitter, Instagram } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 const footerLinks = {
-    discover: {
-        title: "Scopri",
-        links: [
-            { label: "Esplora fragranze", href: "/explore" },
-            { label: "Top fragranze", href: "/explore?sort=rating" },
-            { label: "Nuove uscite", href: "/explore?sort=new" },
-            { label: "Brand", href: "/brands" },
-        ],
-    },
-    categories: {
-        title: "Categorie",
-        links: [
-            { label: "Maschili", href: "/explore?gender=masculine" },
-            { label: "Femminili", href: "/explore?gender=feminine" },
-            { label: "Unisex", href: "/explore?gender=unisex" },
-            { label: "Niche", href: "/explore?type=niche" },
-        ],
-    },
-    resources: {
-        title: "Risorse",
-        links: [
-            { label: "Note olfattive", href: "/notes" },
-            { label: "Guida alle fragranze", href: "/guide" },
-            { label: "Blog", href: "/blog" },
-            { label: "Community", href: "/community" },
-        ],
-    },
-    legal: {
-        title: "Legal",
-        links: [
-            { label: "Privacy Policy", href: "/privacy" },
-            { label: "Termini di servizio", href: "/terms" },
-            { label: "Cookie Policy", href: "/cookies" },
-            { label: "Contatti", href: "/contact" },
-        ],
-    },
+    Esplora: ["Novità", "Trending", "Nicchia", "Designer", "Note Olfattive"],
+    Azienda: ["Chi Siamo", "Carriere", "Stampa", "Contatti"],
+    Legale: ["Termini", "Privacy", "Cookie Policy", "GDPR"],
+    Social: ["Instagram", "TikTok", "Pinterest", "Spotify"],
 };
 
-const socialLinks = [
-    { label: "Twitter", href: "https://twitter.com", icon: Twitter },
-    { label: "Instagram", href: "https://instagram.com", icon: Instagram },
-    { label: "GitHub", href: "https://github.com", icon: Github },
-];
-
-/**
- * Modern footer with multiple columns and social links
- */
 export function Footer() {
     return (
-        <footer className="border-t border-border-primary bg-bg-secondary">
-            {/* Main Footer */}
-            <div className="container-page py-16 lg:py-20">
-                <div className="grid gap-12 lg:grid-cols-6">
-                    {/* Brand Column */}
-                    <div className="lg:col-span-2">
-                        <Link href="/" className="inline-flex text-text-primary transition-colors hover:text-accent">
-                            <Logo size="lg" />
-                        </Link>
-                        <p className="mt-4 max-w-xs text-sm leading-relaxed text-text-secondary">
-                            Il database italiano delle fragranze. Scopri, esplora e trova
-                            il tuo profumo perfetto tra oltre 24.000 fragranze.
-                        </p>
-                        {/* Social Links */}
-                        <div className="mt-6 flex items-center gap-3">
-                            {socialLinks.map((social) => (
-                                <a
-                                    key={social.label}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border-primary text-text-muted transition-all hover:border-accent hover:text-accent"
-                                    aria-label={social.label}
-                                >
-                                    <social.icon className="h-4 w-4" />
-                                </a>
-                            ))}
-                        </div>
-                    </div>
+        <footer className="bg-bg-primary border-t border-border-primary pt-24 pb-8 text-text-primary">
+            <div className="container-page grid grid-cols-1 md:grid-cols-12 gap-12 mb-24">
+                {/* Brand Column */}
+                <div className="md:col-span-4 flex flex-col gap-6">
+                    <Logo size="lg" />
+                    <p className="text-lg text-text-secondary leading-relaxed max-w-sm text-balance">
+                        Il database definitivo per la cultura olfattiva.
+                        Scopri, recensisci e colleziona le fragranze che definiscono il tuo stile.
+                    </p>
+                </div>
 
-                    {/* Links Columns */}
-                    {Object.entries(footerLinks).map(([key, section]) => (
-                        <div key={key}>
-                            <h3 className="text-sm font-semibold uppercase tracking-widest text-text-primary">
-                                {section.title}
-                            </h3>
-                            <ul className="mt-4 space-y-3">
-                                {section.links.map((link) => (
-                                    <li key={link.href}>
-                                        <Link
-                                            href={link.href}
-                                            className="text-sm text-text-muted transition-colors hover:text-accent"
-                                        >
-                                            {link.label}
-                                        </Link>
+                {/* Links Columns */}
+                <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+                    {Object.entries(footerLinks).map(([category, links]) => (
+                        <div key={category}>
+                            <h4 className="font-mono text-xs uppercase tracking-widest mb-6 text-text-muted">{category}</h4>
+                            <ul className="space-y-4">
+                                {links.map(link => (
+                                    <li key={link}>
+                                        <Link href="#" className="text-sm hover:text-text-tertiary transition-colors">{link}</Link>
                                     </li>
                                 ))}
                             </ul>
@@ -105,24 +38,30 @@ export function Footer() {
                 </div>
             </div>
 
-            {/* Bottom Bar */}
-            <div className="border-t border-border-primary">
-                <div className="container-page flex flex-col items-center justify-between gap-4 py-6 md:flex-row">
-                    <p className="text-sm text-text-muted">
-                        © {new Date().getFullYear()} Sillage. Tutti i diritti riservati.
-                    </p>
-                    <div className="flex items-center gap-6 text-sm text-text-muted">
-                        <Link href="/privacy" className="transition-colors hover:text-text-primary">
-                            Privacy
-                        </Link>
-                        <Link href="/terms" className="transition-colors hover:text-text-primary">
-                            Termini
-                        </Link>
-                        <Link href="/cookies" className="transition-colors hover:text-text-primary">
-                            Cookie
-                        </Link>
+            {/* Newsletter - Minimal Grid */}
+            <div className="container-page border-t border-border-primary pt-12">
+                <div className="grid md:grid-cols-2 gap-12 items-end">
+                    <div>
+                        <h3 className="font-serif text-3xl mb-4">Rimani aggiornato.</h3>
+                        <p className="text-text-secondary text-sm">Le ultime novità dal mondo della profumeria, direttamente nella tua inbox.</p>
+                    </div>
+                    <div>
+                        <form className="flex item-end border-b border-text-primary pb-2">
+                            <input
+                                type="email"
+                                placeholder="LA TUA EMAIL"
+                                className="w-full bg-transparent outline-none uppercase tracking-widest text-sm placeholder:text-text-muted"
+                            />
+                            <button className="text-xs uppercase font-bold tracking-widest ml-4 hover:opacity-70">Iscriviti</button>
+                        </form>
                     </div>
                 </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="container-page mt-24 pt-8 text-xs text-text-muted uppercase tracking-widest flex flex-col md:flex-row justify-between items-center gap-4">
+                <span>© 2025 Sillage Inc. Tutti i diritti riservati.</span>
+                <span className="text-[10px]">Milano • Paris • New York</span>
             </div>
         </footer>
     );

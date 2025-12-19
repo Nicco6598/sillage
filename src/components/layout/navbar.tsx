@@ -1,73 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import { Search, Heart, User, Menu, X, Mail, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Heart, User, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface NavItem {
     label: string;
     href: string;
-    description?: string;
 }
 
 const navItems: NavItem[] = [
-    { label: "Home", href: "/", description: "Torna alla home" },
-    { label: "Esplora", href: "/explore", description: "24k+ fragranze" },
-    { label: "Brands", href: "/brands", description: "I migliori marchi" },
-    { label: "Note", href: "/notes", description: "Piramide olfattiva" },
-    { label: "Community", href: "/community", description: "Unisciti a noi" },
+    { label: "Esplora", href: "/explore" },
+    { label: "Brands", href: "/brands" },
+    { label: "Note", href: "/notes" },
+    { label: "Community", href: "/community" },
 ];
 
 /**
- * Modern 2025 navbar with ultra-minimal fullscreen mobile menu
+ * Ultra-Minimal Navbar - 2025 Complete Rework
+ * Clean, spacious, search in mobile menu
  */
 export function Navbar() {
     const router = useRouter();
+    const pathname = usePathname();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
     const [mobileSearchQuery, setMobileSearchQuery] = useState("");
-    const searchInputRef = useRef<HTMLInputElement>(null);
-    const mobileSearchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
+            setIsScrolled(window.scrollY > 20);
         };
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
-
-    useEffect(() => {
-        if (isMobileMenuOpen) {
-            document.body.style.overflow = "hidden";
-            // Focus search on menu open
-            setTimeout(() => mobileSearchRef.current?.focus(), 300);
-        } else {
-            document.body.style.overflow = "";
-        }
-        return () => { document.body.style.overflow = ""; };
-    }, [isMobileMenuOpen]);
-
-    useEffect(() => {
-        if (isSearchOpen && searchInputRef.current) {
-            searchInputRef.current.focus();
-        }
-    }, [isSearchOpen]);
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
-            setIsSearchOpen(false);
-            setSearchQuery("");
-        }
-    };
 
     const handleMobileSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -82,223 +52,172 @@ export function Navbar() {
         <>
             <header
                 className={cn(
-                    "fixed left-0 right-0 top-0 z-50 transition-all duration-300",
+                    "fixed left-0 right-0 top-0 z-50 transition-all duration-400",
                     isScrolled
-                        ? "border-b border-border-primary bg-bg-secondary/95 backdrop-blur-md shadow-sm"
-                        : "bg-bg-secondary border-b border-border-primary"
+                        ? "bg-bg-primary/80 backdrop-blur-md border-b border-border-primary/50 py-1.5"
+                        : "bg-transparent py-2 lg:py-3"
                 )}
             >
-                {/* Row 1 */}
-                <div className="border-b border-border-primary">
-                    <div className="container-page">
-                        <div className="flex h-16 items-center justify-between">
-                            {/* Left: Contact (desktop) / Logo (mobile) */}
-                            <div className="hidden items-center gap-4 text-sm text-text-muted lg:flex">
-                                <a
-                                    href="mailto:info@sillage.com"
-                                    className="flex items-center gap-2 transition-colors hover:text-text-primary"
-                                >
-                                    <Mail className="h-4 w-4" />
-                                    info@sillage.com
-                                </a>
-                            </div>
+                <div className="container-page">
+                    <div className="flex items-center justify-between">
+                        {/* Logo - Smaller on mobile */}
+                        <Link href="/" className="z-50">
+                            <Logo size="md" className="lg:hidden" />
+                            <Logo size="lg" className="hidden lg:block" />
+                        </Link>
 
-                            {/* Center: Logo */}
-                            <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center text-text-primary transition-colors hover:text-accent">
-                                <Logo size="lg" />
+                        {/* Desktop Navigation - Centered */}
+                        <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+                            {navItems.map((item) => {
+                                const isActive = pathname === item.href;
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className="relative group"
+                                    >
+                                        <span className={cn(
+                                            "text-[13px] font-medium tracking-wide transition-colors uppercase",
+                                            isActive ? "text-text-primary" : "text-text-muted hover:text-text-primary"
+                                        )}>
+                                            {item.label}
+                                        </span>
+                                        <span className={cn(
+                                            "absolute -bottom-1 left-0 h-[1px] bg-text-primary transition-all duration-300",
+                                            isActive ? "w-full" : "w-0 group-hover:w-full"
+                                        )} />
+                                    </Link>
+                                );
+                            })}
+                        </nav>
+
+                        {/* Desktop Actions */}
+                        <div className="hidden lg:flex items-center gap-2">
+                            <Link
+                                href="/explore"
+                                className="p-2 text-text-muted hover:text-text-primary transition-colors"
+                                aria-label="Search"
+                            >
+                                <Search className="h-[18px] w-[18px]" />
                             </Link>
 
-                            {/* Right: Actions */}
-                            <div className="flex items-center gap-3">
-                                {/* Desktop: Expandable Search */}
-                                <div className="relative hidden sm:block">
-                                    <form onSubmit={handleSearch} className="flex items-center">
-                                        <div
-                                            className={cn(
-                                                "flex items-center overflow-hidden rounded-full border transition-all duration-300",
-                                                isSearchOpen
-                                                    ? "w-64 border-accent bg-bg-tertiary"
-                                                    : "w-10 border-transparent"
-                                            )}
-                                        >
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                                                className="flex h-10 w-10 shrink-0 items-center justify-center text-text-tertiary transition-colors hover:text-text-primary"
-                                                aria-label="Cerca"
-                                            >
-                                                <Search className="h-5 w-5" />
-                                            </button>
-                                            {isSearchOpen && (
-                                                <input
-                                                    ref={searchInputRef}
-                                                    type="text"
-                                                    value={searchQuery}
-                                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                                    placeholder="Cerca fragranze..."
-                                                    className="h-10 w-full bg-transparent pr-4 text-sm text-text-primary outline-none placeholder:text-text-muted"
-                                                    onBlur={() => {
-                                                        if (!searchQuery) setTimeout(() => setIsSearchOpen(false), 200);
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Escape") {
-                                                            setIsSearchOpen(false);
-                                                            setSearchQuery("");
-                                                        }
-                                                    }}
-                                                />
-                                            )}
-                                        </div>
-                                    </form>
-                                </div>
+                            <Link
+                                href="/favorites"
+                                className="p-2 text-text-muted hover:text-text-primary transition-colors"
+                                aria-label="Favorites"
+                            >
+                                <Heart className="h-[18px] w-[18px]" />
+                            </Link>
 
-                                {/* Desktop: Favorites */}
-                                <Link
-                                    href="/favorites"
-                                    className="hidden h-10 w-10 items-center justify-center rounded-full border border-border-primary text-text-tertiary transition-all hover:border-accent hover:text-accent sm:flex"
-                                    aria-label="Preferiti"
-                                >
-                                    <Heart className="h-5 w-5" />
-                                </Link>
-
-                                {/* Desktop: Theme Toggle */}
-                                <div className="hidden sm:block">
-                                    <ThemeToggle />
-                                </div>
-
-                                {/* Desktop: Login */}
-                                <Link
-                                    href="/login"
-                                    className="hidden h-10 items-center gap-2 rounded-full bg-text-primary px-5 text-sm font-medium text-text-inverted transition-all hover:opacity-90 sm:flex"
-                                >
-                                    <User className="h-4 w-4" />
-                                    Accedi
-                                </Link>
-
-                                {/* Mobile: Menu Toggle (rightmost) */}
-                                <button
-                                    onClick={() => setIsMobileMenuOpen(true)}
-                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border-primary text-text-primary transition-colors hover:border-accent md:hidden"
-                                    aria-label="Apri menu"
-                                >
-                                    <Menu className="h-5 w-5" />
-                                </button>
+                            <div className="mx-1">
+                                <ThemeToggle />
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Row 2: Desktop Navigation */}
-                <div className="hidden md:block">
-                    <div className="container-page">
-                        <nav className="flex h-12 items-center justify-center gap-10">
-                            {navItems.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className="text-sm font-medium text-text-secondary transition-colors hover:text-accent"
-                                >
-                                    {item.label}
-                                </Link>
-                            ))}
-                        </nav>
+                            <Link
+                                href="/login"
+                                className="ml-2 px-3 py-1.5 text-xs font-medium uppercase tracking-wider border border-border-primary hover:bg-bg-secondary transition-colors"
+                            >
+                                Accedi
+                            </Link>
+                        </div>
+
+                        {/* Mobile Menu Button */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-2 text-text-primary"
+                            aria-label="Menu"
+                        >
+                            <Menu className="h-5 w-5" />
+                        </button>
                     </div>
                 </div>
             </header>
 
-            {/* Mobile Menu - Ultra Minimal 2025 */}
+            {/* Mobile Menu - Full Screen */}
             <div
                 className={cn(
-                    "fixed inset-0 z-[100] flex flex-col bg-bg-primary transition-all duration-500 ease-out md:hidden",
-                    isMobileMenuOpen
-                        ? "pointer-events-auto opacity-100"
-                        : "pointer-events-none opacity-0"
+                    "fixed inset-0 z-[100] bg-bg-primary transition-all duration-500 lg:hidden",
+                    isMobileMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full pointer-events-none"
                 )}
             >
-                {/* Top Bar */}
-                <div className="flex h-16 shrink-0 items-center justify-between px-6">
-                    <span className="text-sm font-medium uppercase tracking-widest text-text-muted">
-                        Menu
-                    </span>
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-border-primary">
+                    <Logo size="md" />
                     <button
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-tertiary text-text-primary"
-                        aria-label="Chiudi"
+                        className="p-2 text-text-primary"
+                        aria-label="Close"
                     >
                         <X className="h-5 w-5" />
                     </button>
                 </div>
 
-                {/* Search Bar */}
-                <div className="shrink-0 px-6 pb-6">
-                    <form onSubmit={handleMobileSearch}>
-                        <div className="flex items-center gap-3 rounded-2xl bg-bg-tertiary px-4">
-                            <Search className="h-5 w-5 shrink-0 text-text-muted" />
-                            <input
-                                ref={mobileSearchRef}
-                                type="text"
-                                value={mobileSearchQuery}
-                                onChange={(e) => setMobileSearchQuery(e.target.value)}
-                                placeholder="Cerca tra 24k+ fragranze..."
-                                className="h-14 w-full bg-transparent text-lg text-text-primary outline-none placeholder:text-text-muted"
-                            />
-                        </div>
+                {/* Search Bar - Mobile Only */}
+                <div className="px-6 pt-6 pb-4 border-b border-border-primary">
+                    <form onSubmit={handleMobileSearch} className="relative">
+                        <input
+                            type="text"
+                            value={mobileSearchQuery}
+                            onChange={(e) => setMobileSearchQuery(e.target.value)}
+                            placeholder="CERCA FRAGRANZE..."
+                            className="w-full bg-bg-secondary border border-border-primary px-4 py-3 text-sm uppercase tracking-wider outline-none focus:border-text-primary transition-colors placeholder:text-text-muted"
+                        />
+                        <button
+                            type="submit"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                        >
+                            <Search className="h-5 w-5" />
+                        </button>
                     </form>
                 </div>
 
-                {/* Navigation - Minimal with numbers */}
-                <nav className="flex-1 overflow-auto px-6">
-                    <div className="space-y-0">
-                        {navItems.map((item, index) => (
+                {/* Navigation */}
+                <nav className="flex-1 flex flex-col px-6 py-8 gap-1 overflow-y-auto">
+                    <Link
+                        href="/"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={cn(
+                            "py-4 text-2xl font-serif transition-colors border-b border-border-primary",
+                            pathname === "/" ? "text-text-primary" : "text-text-muted"
+                        )}
+                    >
+                        Home
+                    </Link>
+                    {navItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        return (
                             <Link
                                 key={item.href}
                                 href={item.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="group flex items-center justify-between border-t border-border-primary py-6 first:border-t-0"
+                                className={cn(
+                                    "py-4 text-2xl font-serif transition-colors border-b border-border-primary",
+                                    isActive ? "text-text-primary" : "text-text-muted"
+                                )}
                             >
-                                <div className="flex items-center gap-6">
-                                    <span className="text-sm font-mono text-text-muted">
-                                        0{index + 1}
-                                    </span>
-                                    <div>
-                                        <span className="text-2xl font-semibold text-text-primary transition-colors group-hover:text-accent">
-                                            {item.label}
-                                        </span>
-                                        {item.description && (
-                                            <p className="mt-0.5 text-sm text-text-muted">
-                                                {item.description}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                                <ArrowRight className="h-5 w-5 text-text-muted opacity-0 transition-all group-hover:translate-x-1 group-hover:text-accent group-hover:opacity-100" />
+                                {item.label}
                             </Link>
-                        ))}
-                    </div>
+                        );
+                    })}
                 </nav>
 
-                {/* Bottom Bar */}
-                <div className="shrink-0 border-t border-border-primary px-6 py-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <Link
-                                href="/favorites"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex h-12 w-12 items-center justify-center rounded-full border border-border-primary text-text-secondary transition-colors hover:border-accent hover:text-accent"
-                            >
-                                <Heart className="h-5 w-5" />
-                            </Link>
-                            <ThemeToggle />
-                        </div>
+                {/* Footer */}
+                <div className="p-6 border-t border-border-primary flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <ThemeToggle />
                         <Link
-                            href="/login"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-sm font-medium text-white"
+                            href="/favorites"
+                            className="p-2 text-text-muted hover:text-text-primary transition-colors"
                         >
-                            <User className="h-4 w-4" />
-                            Accedi
+                            <Heart className="h-5 w-5" />
                         </Link>
                     </div>
+                    <Link
+                        href="/login"
+                        className="px-4 py-2 text-xs font-medium uppercase tracking-wider border border-border-primary hover:bg-bg-secondary transition-colors"
+                    >
+                        Accedi
+                    </Link>
                 </div>
             </div>
         </>

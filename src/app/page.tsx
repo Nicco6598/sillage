@@ -1,296 +1,189 @@
 import Link from "next/link";
-import { getFeaturedFragrances } from "@/lib/fragrance-service";
-import { FragranceCard } from "@/components/fragrance/fragrance-card";
-import { ArrowRight, Search, Star, TrendingUp, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, TrendingUp, Star } from "lucide-react";
 
-/**
- * Homepage - Sillage
- * Modern, minimal design with proper hierarchy and spacing
- */
-export default async function HomePage() {
-  const featuredFragrances = await getFeaturedFragrances(6);
-
+export default function Home() {
   return (
-    <div className="flex flex-col">
-      {/* ============================================
-          HERO SECTION
-          ============================================ */}
-      <section className="relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent" />
+    <div className="flex flex-col w-full">
+      {/* HERO SECTION - Modern Animated Gradient */}
+      <section className="relative h-screen w-full overflow-hidden">
+        {/* Animated Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-50 via-stone-100 to-stone-200 dark:from-stone-950 dark:via-stone-900 dark:to-stone-800">
+          {/* Animated Orbs */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-highlight/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-text-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+        </div>
 
-        <div className="container-page relative">
-          <div className="flex min-h-[70vh] flex-col items-center justify-center py-20 text-center">
-            {/* Eyebrow */}
-            <div className="mb-8 flex items-center gap-3 rounded-full border border-border-primary bg-bg-secondary px-5 py-2.5">
-              <span className="flex h-2 w-2 rounded-full bg-accent" />
-              <span className="text-sm font-medium text-text-secondary">
-                Il database italiano delle fragranze
-              </span>
-            </div>
+        {/* Subtle Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(var(--text-muted)/0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgb(var(--text-muted)/0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
-            {/* Main Headline */}
-            <h1 className="max-w-4xl text-4xl font-bold leading-[1.1] tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl">
-              Scopri il mondo delle{" "}
-              <span className="relative">
-                <span className="relative z-10 bg-gradient-to-r from-accent via-accent-secondary to-accent-tertiary bg-clip-text text-transparent">
-                  fragranze
-                </span>
-              </span>
+        {/* Content */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="container-page flex flex-col items-center text-center">
+            <span className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-text-muted">
+              Il database italiano delle fragranze
+            </span>
+
+            <h1 className="max-w-4xl font-serif text-6xl font-medium leading-[1.1] tracking-tight sm:text-7xl md:text-8xl lg:text-9xl text-balance">
+              Scopri il tuo<br />
+              <span className="italic">profumo.</span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-text-secondary sm:text-xl">
-              Esplora oltre 24.000 profumi, leggi recensioni dalla community
-              e trova la tua firma olfattiva perfetta.
-            </p>
-
-            {/* CTA Group */}
-            <div className="mt-12 flex w-full max-w-md flex-col gap-4 sm:flex-row sm:justify-center">
+            <div className="mt-12 flex flex-col items-center gap-6 sm:flex-row">
               <Link
                 href="/explore"
-                className="group flex h-14 flex-1 items-center justify-center gap-3 rounded-2xl bg-accent px-8 text-base font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent-hover hover:shadow-xl hover:shadow-accent/30"
+                className="group flex h-14 items-center gap-4 border-b-2 border-text-primary pb-1 text-lg font-medium text-text-primary transition-all hover:border-text-secondary hover:text-text-secondary"
               >
-                <Search className="h-5 w-5" />
-                Esplora fragranze
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                Esplora Collezione
+                <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-2" />
               </Link>
             </div>
+          </div>
+        </div>
 
-            {/* Trust indicators */}
-            <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-text-muted">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-bg-primary bg-bg-tertiary text-xs font-medium"
-                    >
-                      {["A", "M", "G", "S"][i - 1]}
-                    </div>
-                  ))}
-                </div>
-                <span>50k+ utenti attivi</span>
+        {/* Minimal Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="h-16 w-[1px] bg-text-muted/30"></div>
+        </div>
+      </section>
+
+      {/* SEZIONE 1: EDITORIAL STATEMENT */}
+      <section className="py-24 sm:py-32 bg-bg-primary text-text-primary">
+        <div className="container-page grid gap-12 lg:grid-cols-2 lg:gap-24 items-center">
+          <div>
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl leading-tight">
+              L'arte della profumeria, <span className="italic text-text-secondary">decodificata.</span>
+            </h2>
+          </div>
+          <div>
+            <p className="text-lg md:text-xl text-text-secondary leading-relaxed text-balance">
+              Sillage è la destinazione definitiva per gli amanti delle fragranze.
+              Esplora oltre 24.000 profumi, leggi recensioni autentiche e
+              trova la tua firma olfattiva attraverso un viaggio sensoriale curato.
+            </p>
+            <div className="mt-8 flex gap-12 border-t border-border-primary pt-8">
+              <div>
+                <span className="block font-serif text-4xl mb-2">24k+</span>
+                <span className="text-xs font-mono uppercase tracking-widest text-text-muted">Fragranze</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-warning" />
-                <span>100k+ recensioni</span>
+              <div>
+                <span className="block font-serif text-4xl mb-2">50k+</span>
+                <span className="text-xs font-mono uppercase tracking-widest text-text-muted">Utenti</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ============================================
-          FEATURED FRAGRANCES
-          ============================================ */}
-      <section className="border-t border-border-primary py-24">
+      {/* SEZIONE 2: TRENDING (Minimal Grid) */}
+      <section className="py-24 border-t border-border-primary bg-bg-secondary">
         <div className="container-page">
-          {/* Section Header */}
-          <div className="mb-16 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
-            <div>
-              <div className="flex items-center gap-2 text-accent">
-                <TrendingUp className="h-4 w-4" />
-                <span className="text-sm font-semibold uppercase tracking-widest">
-                  In evidenza
-                </span>
-              </div>
-              <h2 className="mt-3 text-3xl font-bold text-text-primary sm:text-4xl">
-                Fragranze del momento
-              </h2>
-              <p className="mt-3 max-w-lg text-text-secondary">
-                Le fragranze più amate dalla nostra community questa settimana.
-              </p>
-            </div>
-            <Link
-              href="/explore"
-              className="group flex items-center gap-2 rounded-full border border-border-primary px-5 py-2.5 text-sm font-medium text-text-secondary transition-all hover:border-accent hover:text-accent"
-            >
-              Vedi tutte
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <div className="flex items-end justify-between mb-16">
+            <h2 className="font-serif text-4xl sm:text-5xl">Trending Now</h2>
+            <Link href="/explore?sort=trending" className="hidden sm:flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-text-primary hover:text-text-secondary transition-colors">
+              Vedi tutto <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          {/* Fragrances Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredFragrances.map((fragrance) => (
-              <FragranceCard key={fragrance.id} fragrance={fragrance} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================
-          CATEGORIES
-          ============================================ */}
-      <section className="bg-bg-secondary py-24">
-        <div className="container-page">
-          {/* Section Header */}
-          <div className="mb-16 text-center">
-            <div className="flex items-center justify-center gap-2 text-accent">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-sm font-semibold uppercase tracking-widest">
-                Categorie
-              </span>
-            </div>
-            <h2 className="mt-3 text-3xl font-bold text-text-primary sm:text-4xl">
-              Esplora per stile
-            </h2>
-            <p className="mx-auto mt-3 max-w-lg text-text-secondary">
-              Trova fragranze che si adattano al tuo gusto personale.
-            </p>
-          </div>
-
-          {/* Categories Grid */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                label: "Maschili",
-                href: "/explore?gender=masculine",
-                emoji: "🧔",
-                count: "8.5k",
-                color: "from-blue-500/10 to-indigo-500/10",
-              },
-              {
-                label: "Femminili",
-                href: "/explore?gender=feminine",
-                emoji: "👩",
-                count: "10.2k",
-                color: "from-pink-500/10 to-rose-500/10",
-              },
-              {
-                label: "Unisex",
-                href: "/explore?gender=unisex",
-                emoji: "✨",
-                count: "5.3k",
-                color: "from-violet-500/10 to-purple-500/10",
-              },
-              {
-                label: "Niche",
-                href: "/explore?type=niche",
-                emoji: "💎",
-                count: "3.1k",
-                color: "from-amber-500/10 to-orange-500/10",
-              },
-            ].map((cat) => (
-              <Link
-                key={cat.label}
-                href={cat.href}
-                className="group relative overflow-hidden rounded-2xl border border-border-primary bg-bg-primary p-6 transition-all hover:border-accent hover:shadow-lg"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 transition-opacity group-hover:opacity-100`} />
-                <div className="relative">
-                  <span className="text-4xl">{cat.emoji}</span>
-                  <h3 className="mt-4 text-xl font-semibold text-text-primary">
-                    {cat.label}
-                  </h3>
-                  <p className="mt-1 text-sm text-text-muted">
-                    {cat.count} fragranze
-                  </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+            {/* Mock Item 1 */}
+            <Link href="/fragrance/1" className="group block cursor-pointer">
+              <div className="aspect-[3/4] overflow-hidden bg-bg-tertiary">
+                {/* Placeholder for image or just color block for minimal look */}
+                <div className="h-full w-full bg-zinc-200 dark:bg-zinc-800 transition-transform duration-700 ease-out group-hover:scale-105" />
+              </div>
+              <div className="mt-6 flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-medium text-text-primary group-hover:underline decoration-1 underline-offset-4">Bleu de Chanel</h3>
+                  <p className="text-sm text-text-secondary mt-1">Chanel</p>
                 </div>
-                <ArrowRight className="absolute bottom-6 right-6 h-5 w-5 text-text-muted opacity-0 transition-all group-hover:translate-x-1 group-hover:text-accent group-hover:opacity-100" />
-              </Link>
-            ))}
+                <span className="text-sm font-mono text-text-primary">4.8 ★</span>
+              </div>
+            </Link>
+
+            {/* Mock Item 2 */}
+            <Link href="/fragrance/2" className="group block cursor-pointer">
+              <div className="aspect-[3/4] overflow-hidden bg-bg-tertiary">
+                <div className="h-full w-full bg-stone-200 dark:bg-stone-800 transition-transform duration-700 ease-out group-hover:scale-105" />
+              </div>
+              <div className="mt-6 flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-medium text-text-primary group-hover:underline decoration-1 underline-offset-4">Sauvage Elixir</h3>
+                  <p className="text-sm text-text-secondary mt-1">Dior</p>
+                </div>
+                <span className="text-sm font-mono text-text-primary">4.9 ★</span>
+              </div>
+            </Link>
+
+            {/* Mock Item 3 */}
+            <Link href="/fragrance/3" className="group block cursor-pointer">
+              <div className="aspect-[3/4] overflow-hidden bg-bg-tertiary">
+                <div className="h-full w-full bg-zinc-300 dark:bg-zinc-700 transition-transform duration-700 ease-out group-hover:scale-105" />
+              </div>
+              <div className="mt-6 flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-medium text-text-primary group-hover:underline decoration-1 underline-offset-4">Oud Wood</h3>
+                  <p className="text-sm text-text-secondary mt-1">Tom Ford</p>
+                </div>
+                <span className="text-sm font-mono text-text-primary">4.7 ★</span>
+              </div>
+            </Link>
           </div>
 
-          {/* Accords Pills */}
-          <div className="mt-12 flex flex-wrap justify-center gap-3">
-            {[
-              { label: "Legnosi", emoji: "🪵" },
-              { label: "Freschi", emoji: "🌊" },
-              { label: "Orientali", emoji: "🌙" },
-              { label: "Floreali", emoji: "🌸" },
-              { label: "Agrumati", emoji: "🍋" },
-              { label: "Speziati", emoji: "🌶️" },
-            ].map((accord) => (
-              <Link
-                key={accord.label}
-                href={`/explore?accord=${accord.label.toLowerCase()}`}
-                className="flex items-center gap-2 rounded-full border border-border-primary bg-bg-primary px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:border-accent hover:text-accent"
-              >
-                <span>{accord.emoji}</span>
-                {accord.label}
-              </Link>
-            ))}
+          <div className="mt-16 text-center sm:hidden">
+            <Link href="/explore" className="text-sm font-medium uppercase tracking-widest underline underline-offset-4">Vedi tutti i trending</Link>
           </div>
         </div>
       </section>
 
-      {/* ============================================
-          BRANDS
-          ============================================ */}
-      <section className="border-t border-border-primary py-24">
+      {/* SEZIONE 3: CATEGORIES (Large visual blocks) */}
+      <section className="py-24 bg-bg-primary border-t border-border-primary">
         <div className="container-page">
-          {/* Section Header */}
-          <div className="mb-16 text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-accent">
-              Brand
-            </span>
-            <h2 className="mt-3 text-3xl font-bold text-text-primary sm:text-4xl">
-              I marchi più amati
-            </h2>
-          </div>
+          <h2 className="font-serif text-4xl sm:text-5xl mb-16 text-center">Esplora per Categoria</h2>
 
-          {/* Brands Grid */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {[
-              "Chanel",
-              "Dior",
-              "Tom Ford",
-              "Creed",
-              "Armani",
-              "YSL",
-            ].map((brand) => (
-              <Link
-                key={brand}
-                href={`/explore?brand=${brand.toLowerCase().replace(" ", "-")}`}
-                className="flex h-28 items-center justify-center rounded-2xl border border-border-primary bg-bg-secondary text-lg font-semibold text-text-secondary transition-all hover:border-accent hover:bg-bg-primary hover:text-text-primary"
-              >
-                {brand}
-              </Link>
-            ))}
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link href="/explore?category=niche" className="relative h-[60vh] group overflow-hidden bg-black text-white">
+              <div className="absolute inset-0 bg-neutral-900 group-hover:bg-neutral-800 transition-colors duration-500" />
+              {/* Image would go here as bg */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10">
+                <span className="font-mono text-xs uppercase tracking-widest mb-4 opacity-70">Curated</span>
+                <h3 className="font-serif text-5xl md:text-6xl italic group-hover:scale-110 transition-transform duration-700">Nicchia</h3>
+                <div className="mt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center gap-2 text-sm uppercase tracking-widest border-b border-white pb-1">
+                  Scopri <ArrowRight className="h-4 w-4" />
+                </div>
+              </div>
+            </Link>
 
-          <div className="mt-10 text-center">
-            <Link
-              href="/brands"
-              className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary transition-colors hover:text-accent"
-            >
-              Vedi tutti i 500+ brand
-              <ArrowRight className="h-4 w-4" />
+            <Link href="/explore?category=designer" className="relative h-[60vh] group overflow-hidden bg-white text-black border border-border-primary">
+              <div className="absolute inset-0 bg-neutral-100 group-hover:bg-neutral-200 transition-colors duration-500" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10">
+                <span className="font-mono text-xs uppercase tracking-widest mb-4 text-neutral-500">Popular</span>
+                <h3 className="font-serif text-5xl md:text-6xl group-hover:scale-110 transition-transform duration-700">Designer</h3>
+                <div className="mt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center gap-2 text-sm uppercase tracking-widest border-b border-black pb-1">
+                  Scopri <ArrowRight className="h-4 w-4" />
+                </div>
+              </div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ============================================
-          FINAL CTA
-          ============================================ */}
-      <section className="bg-gradient-to-br from-accent/10 via-accent-secondary/5 to-transparent py-24">
-        <div className="container-page">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold text-text-primary sm:text-4xl">
-              Pronto a iniziare?
-            </h2>
-            <p className="mt-4 text-lg text-text-secondary">
-              Unisciti a oltre 50.000 appassionati di fragranze.
-              È completamente gratuito.
-            </p>
-
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Link
-                href="/register"
-                className="flex h-14 items-center justify-center rounded-2xl bg-accent px-10 text-base font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent-hover hover:shadow-xl"
-              >
-                Crea account gratuito
-              </Link>
-              <Link
-                href="/explore"
-                className="flex h-14 items-center justify-center rounded-2xl border border-border-secondary bg-bg-secondary px-10 text-base font-semibold text-text-primary transition-all hover:border-accent hover:bg-bg-primary"
-              >
-                Esplora senza account
-              </Link>
-            </div>
+      {/* SEZIONE 4: COMMUNITY CTA */}
+      <section className="py-32 bg-bg-secondary text-center border-t border-border-primary">
+        <div className="container-page max-w-3xl mx-auto">
+          <Sparkles className="h-8 w-8 mx-auto mb-8 text-text-primary" />
+          <h2 className="font-serif text-4xl sm:text-6xl mb-8">La tua opinione conta.</h2>
+          <p className="text-xl text-text-secondary leading-relaxed mb-12">
+            Unisciti alla conversazione globale sulle fragranze. Condividi le tue esperienze,
+            leggi recensioni oneste e costruisci la tua collezione digitale.
+          </p>
+          <div className="flex justify-center gap-6">
+            <Link href="/register" className="bg-text-primary text-bg-primary px-8 py-4 text-sm uppercase tracking-widest font-medium hover:bg-text-secondary transition-colors">
+              Registrati Ora
+            </Link>
+            <Link href="/community" className="border border-border-strong px-8 py-4 text-sm uppercase tracking-widest font-medium hover:bg-bg-tertiary transition-colors">
+              Vedi Community
+            </Link>
           </div>
         </div>
       </section>
