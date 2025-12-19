@@ -4,46 +4,68 @@ import { ArrowRight, Sparkles, TrendingUp, Star } from "lucide-react";
 export default function Home() {
   return (
     <div className="flex flex-col w-full">
-      {/* HERO SECTION - Modern Animated Gradient */}
-      <section className="relative h-screen w-full overflow-hidden">
-        {/* Animated Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-stone-50 via-stone-100 to-stone-200 dark:from-stone-950 dark:via-stone-900 dark:to-stone-800">
-          {/* Animated Orbs */}
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-highlight/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-text-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+      {/* HERO SECTION - Modern Dynamic */}
+      <section className="relative h-screen w-full overflow-hidden flex items-center justify-center">
+        {/* Dynamic Background */}
+        <div className="absolute inset-0 bg-bg-primary transition-colors duration-500">
+          {/* Gradient Orbs - Using CSS variables for theme adaptation */}
+          <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-indigo-200/30 to-purple-200/30 dark:from-indigo-900/20 dark:to-purple-900/20 blur-[120px] animate-pulse-slow" />
+          <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tl from-amber-200/30 to-orange-200/30 dark:from-amber-900/20 dark:to-orange-900/20 blur-[100px] animate-pulse-slow delay-1000" />
         </div>
 
-        {/* Subtle Grid Overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(var(--text-muted)/0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgb(var(--text-muted)/0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        {/* Pattern Overlay */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        />
 
         {/* Content */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="container-page flex flex-col items-center text-center">
-            <span className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-text-muted">
+        <div className="container-page relative z-10 flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bg-secondary border border-border-primary mb-8 animate-fade-in-up">
+            <Sparkles className="h-3 w-3 text-accent" />
+            <span className="text-[10px] font-mono uppercase tracking-widest text-text-secondary">
               Il database italiano delle fragranze
             </span>
+          </div>
 
-            <h1 className="max-w-4xl font-serif text-6xl font-medium leading-[1.1] tracking-tight sm:text-7xl md:text-8xl lg:text-9xl text-balance">
-              Scopri il tuo<br />
-              <span className="italic">profumo.</span>
-            </h1>
+          <h1 className="max-w-5xl font-serif text-6xl md:text-8xl lg:text-9xl leading-[0.9] tracking-tight mb-8 text-text-primary animate-fade-in-up delay-100">
+            Scopri il tuo <br />
+            <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-text-primary via-text-secondary to-text-primary bg-300% animate-gradient">
+              profumo.
+            </span>
+          </h1>
 
-            <div className="mt-12 flex flex-col items-center gap-6 sm:flex-row">
-              <Link
-                href="/explore"
-                className="group flex h-14 items-center gap-4 border-b-2 border-text-primary pb-1 text-lg font-medium text-text-primary transition-all hover:border-text-secondary hover:text-text-secondary"
-              >
+          <p className="max-w-xl text-lg md:text-xl text-text-secondary leading-relaxed mb-12 animate-fade-in-up delay-200">
+            Esplora, recensisci e colleziona oltre 24.000 fragranze in un'esperienza digitale curata per veri appassionati.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up delay-300">
+            <Link
+              href="/explore"
+              className="group relative px-8 py-3 bg-text-primary text-bg-primary overflow-hidden transition-all hover:bg-text-secondary"
+            >
+              <span className="relative flex items-center gap-3 text-xs font-medium uppercase tracking-widest">
                 Esplora Collezione
-                <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-2" />
-              </Link>
-            </div>
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </Link>
+
+            <Link
+              href="/community"
+              className="px-8 py-3 text-text-primary border border-text-primary hover:bg-text-primary hover:text-bg-primary transition-all text-xs font-medium uppercase tracking-widest"
+            >
+              Community
+            </Link>
           </div>
         </div>
 
-        {/* Minimal Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="h-16 w-[1px] bg-text-muted/30"></div>
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce delay-1000">
+          <div className="flex flex-col items-center gap-2 text-text-muted opacity-50">
+            <span className="text-[10px] uppercase tracking-widest">Scroll</span>
+            <div className="h-12 w-[1px] bg-gradient-to-b from-text-muted to-transparent"></div>
+          </div>
         </div>
       </section>
 
@@ -178,10 +200,17 @@ export default function Home() {
             leggi recensioni oneste e costruisci la tua collezione digitale.
           </p>
           <div className="flex justify-center gap-6">
-            <Link href="/register" className="bg-text-primary text-bg-primary px-8 py-4 text-sm uppercase tracking-widest font-medium hover:bg-text-secondary transition-colors">
+            <Link
+              href="/register"
+              className="group flex items-center gap-3 border-b border-text-primary pb-1 text-sm uppercase tracking-widest font-medium hover:text-text-secondary hover:border-text-secondary transition-all"
+            >
               Registrati Ora
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link href="/community" className="border border-border-strong px-8 py-4 text-sm uppercase tracking-widest font-medium hover:bg-bg-tertiary transition-colors">
+            <Link
+              href="/community"
+              className="group flex items-center gap-3 border-b border-transparent pb-1 text-sm uppercase tracking-widest font-medium text-text-secondary hover:text-text-primary hover:border-text-primary transition-all"
+            >
               Vedi Community
             </Link>
           </div>

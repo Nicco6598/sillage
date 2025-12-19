@@ -3,6 +3,8 @@ import { ArrowRight, Star, Share2, Heart, Clock, Wind, User } from "lucide-react
 import { getFragranceBySlug, getFragranceReviews } from "@/lib/fragrance-db";
 import { notFound } from "next/navigation";
 import { ReviewAction } from "@/components/fragrance/review-action";
+import { RecentlyViewedTracker } from "@/components/features/recently-viewed-tracker";
+import { RecentlyViewed } from "@/components/features/recently-viewed";
 
 interface FragrancePageProps {
     params: Promise<{ slug: string }>;
@@ -354,6 +356,14 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                     </button>
                 </div>
             </div>
+
+            <RecentlyViewedTracker
+                slug={fragrance.slug}
+                name={fragrance.name}
+                brandName={fragrance.brand.name}
+            />
+
+            <RecentlyViewed />
         </div>
     );
 }
