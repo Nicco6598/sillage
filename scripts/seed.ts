@@ -52,11 +52,11 @@ async function seed() {
     // 2. Insert Brands
     console.log('Inserting Brands...');
     const brandsData = [
-        { name: 'Dior', slug: 'dior', country: 'France', website: 'https://dior.com' },
-        { name: 'Tom Ford', slug: 'tom-ford', country: 'USA', website: 'https://tomford.com' },
-        { name: 'Creed', slug: 'creed', country: 'France', website: 'https://creedfragrances.com' },
-        { name: 'Chanel', slug: 'chanel', country: 'France', website: 'https://chanel.com' },
-        { name: 'Giorgio Armani', slug: 'giorgio-armani', country: 'Italy', website: 'https://armani.com' },
+        { name: 'Dior', slug: 'dior', country: 'France' },
+        { name: 'Tom Ford', slug: 'tom-ford', country: 'USA' },
+        { name: 'Creed', slug: 'creed', country: 'France' },
+        { name: 'Chanel', slug: 'chanel', country: 'France' },
+        { name: 'Giorgio Armani', slug: 'giorgio-armani', country: 'Italy' },
     ];
 
     const insertedBrands = await db.insert(schema.brands).values(brandsData).returning();

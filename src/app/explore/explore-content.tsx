@@ -502,9 +502,17 @@ function FragranceCard({ fragrance }: { fragrance: Fragrance }) {
             href={`/fragrance/${fragrance.slug}`}
             className="group block"
         >
-            <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-4">
-                {/* Image Placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-br from-bg-secondary to-bg-tertiary" />
+            <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-4 group/image ring-1 ring-inset ring-white/10 rounded-sm">
+                {fragrance.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        src={fragrance.imageUrl}
+                        alt={fragrance.name}
+                        className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-110"
+                    />
+                ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-bg-secondary to-bg-tertiary" />
+                )}
 
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />

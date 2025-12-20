@@ -14,8 +14,13 @@ export interface FragranceBrand {
     id: string;
     name: string;
     slug: string;
-    logo?: string;
     country?: string;
+}
+
+export interface Brand extends FragranceBrand {
+    description?: string;
+    fragranceCount?: number;
+    history?: string;
 }
 
 export interface Fragrance {

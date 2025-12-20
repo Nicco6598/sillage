@@ -8,8 +8,8 @@ export const brands = pgTable('brands', {
     slug: text('slug').notNull().unique(),
     name: text('name').notNull(),
     country: text('country'),
-    website: text('website'),
-    logoUrl: text('logo_url'),
+    description: text('description'),
+    history: text('history'),
     createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -29,6 +29,7 @@ export const fragrances = pgTable('fragrances', {
     rating: numeric('rating', { precision: 3, scale: 2 }), // Max 5.00
     reviewCount: integer('review_count').default(0),
     imageUrl: text('image_url'),
+    description: text('description'),
     sillageRating: numeric('sillage_rating', { precision: 2, scale: 1 }).default('3.0'),
     longevityRating: numeric('longevity_rating', { precision: 2, scale: 1 }).default('3.0'),
     priceValueRating: numeric('price_value_rating', { precision: 2, scale: 1 }).default('3.0'),
@@ -121,3 +122,5 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
         references: [fragrances.id],
     }),
 }));
+
+

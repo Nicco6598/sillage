@@ -2,7 +2,7 @@
 import { db } from "./db";
 import { fragrances, brands, fragranceNotes, fragranceAccords, notes, reviews } from "./db-schema";
 import { eq, ilike, and, desc, inArray, count } from "drizzle-orm";
-import type { Fragrance } from "@/types/fragrance";
+import type { Fragrance, Brand } from "@/types/fragrance";
 
 /**
  * Helper to transform DB result to Fragrance type
@@ -194,6 +194,32 @@ export async function getFragranceReviews(fragranceId: string) {
         orderBy: desc(reviews.createdAt),
         limit: 10
     });
+}
+
+/**
+ * Get brand by slug
+ */
+export async function getBrandBySlug(slug: string): Promise<Brand | null> {
+    const result = await db.query.brands.findFirst({
+        where: eq(brands.slug, slug),
+        with: {
+            fragrances: {
+                columns: { id: true }
+            }
+        }
+    });
+
+    if (!result) return null;
+
+    return {
+        id: result.id,
+        name: result.name,
+        slug: result.slug,
+        country: result.country || undefined,
+        description: result.description || undefined,
+        history: result.history || undefined,
+        fragranceCount: result.fragrances ? result.fragrances.length : 0
+    };
 }
 
 /**

@@ -34,7 +34,6 @@ export function FragranceCard({ fragrance }: FragranceCardProps) {
     const [imageError, setImageError] = useState(false);
 
     const hasValidImage = fragrance.imageUrl &&
-        fragrance.imageUrl.startsWith("http") &&
         !imageError;
 
     return (
@@ -62,7 +61,7 @@ export function FragranceCard({ fragrance }: FragranceCardProps) {
                         alt={`${fragrance.name} by ${fragrance.brand.name}`}
                         fill
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                        className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                         onError={() => setImageError(true)}
                     />
                 ) : (
@@ -144,7 +143,6 @@ export function FragranceCardCompact({ fragrance }: FragranceCardProps) {
     const [imageError, setImageError] = useState(false);
 
     const hasValidImage = fragrance.imageUrl &&
-        fragrance.imageUrl.startsWith("http") &&
         !imageError;
 
     return (
@@ -156,7 +154,7 @@ export function FragranceCardCompact({ fragrance }: FragranceCardProps) {
             )}
         >
             {/* Image Container */}
-            <div className="relative aspect-square overflow-hidden bg-bg-tertiary">
+            <div className="relative aspect-square overflow-hidden bg-bg-tertiary ring-1 ring-inset ring-white/10 rounded-t-2xl">
                 {/* Gradient Background */}
                 <div
                     className={cn(
@@ -175,7 +173,7 @@ export function FragranceCardCompact({ fragrance }: FragranceCardProps) {
                         alt={`${fragrance.name} by ${fragrance.brand.name}`}
                         fill
                         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                        className="object-contain p-3 transition-transform duration-500 group-hover:scale-110"
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
                         onError={() => setImageError(true)}
                     />
                 ) : (

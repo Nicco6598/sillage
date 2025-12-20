@@ -49,10 +49,20 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                     {/* LEFT COLUMN: Image & Actions */}
                     <div className="lg:col-span-5">
                         {/* Bottle Image */}
-                        <div className="aspect-[3/4] bg-bg-secondary border border-border-primary relative overflow-hidden mb-6">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-1/2 h-2/3 bg-gradient-to-br from-bg-tertiary to-bg-secondary" />
-                            </div>
+                        <div className="aspect-[3/4] bg-bg-secondary border border-border-primary relative overflow-hidden mb-6 group rounded-sm ring-1 ring-inset ring-white/5">
+                            {fragrance.imageUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={fragrance.imageUrl}
+                                    alt={fragrance.name}
+                                    className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-105"
+                                />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-1/2 h-2/3 bg-gradient-to-br from-bg-tertiary to-bg-secondary opacity-50" />
+                                </div>
+                            )}
+
                             {fragrance.isNew && (
                                 <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-mono uppercase tracking-wider bg-copper text-white">
                                     Novità

@@ -9,10 +9,8 @@ const nextConfig: NextConfig = {
         pathname: "/images/**",
       },
       {
-        // Fallback images pattern
         protocol: "https",
-        hostname: "*.cloudfront.net",
-        pathname: "/**",
+        hostname: "**",
       },
     ],
   },
