@@ -1,20 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { useState, useActionState, useEffect } from "react";
+import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { login } from "@/app/actions/auth";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [state, action, isPending] = useActionState(login, undefined);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const router = useRouter();
+    const supabase = createClient();
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        // Simulate loading
-        setTimeout(() => setIsLoading(false), 1500);
-    };
+    useEffect(() => {
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                router.replace('/');
+            }
+        };
+        checkSession();
+
+        // Listen for auth state changes (login success)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                setIsLoggingIn(true);
+            }
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [router, supabase]);
+
+    // Fullscreen loading overlay
+    if (isLoggingIn) {
+        return (
+            <div className="fixed inset-0 bg-bg-primary z-50 flex flex-col items-center justify-center">
+                <Logo size="lg" />
+                <div className="mt-8 flex flex-col items-center gap-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-copper" />
+                    <p className="text-text-secondary font-mono text-sm uppercase tracking-widest">
+                        Accesso in corso...
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex">
@@ -35,19 +70,20 @@ export default function LoginPage() {
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                    <form action={action} className="space-y-8">
                         <div className="space-y-6">
                             {/* Email */}
                             <div className="group">
                                 <label className="block text-xs font-mono uppercase tracking-widest text-text-muted mb-3 group-focus-within:text-copper transition-colors">
-                                    Email
+                                    Email o Username
                                 </label>
                                 <div className="relative">
                                     <input
-                                        type="email"
+                                        name="identifier"
+                                        type="text"
                                         required
                                         className="w-full bg-bg-tertiary/50 border border-border-primary px-4 py-3 outline-none focus:border-copper transition-colors"
-                                        placeholder="tu@esempio.com"
+                                        placeholder="email@esempio.com o username"
                                     />
                                 </div>
                             </div>
@@ -59,6 +95,7 @@ export default function LoginPage() {
                                 </label>
                                 <div className="relative">
                                     <input
+                                        name="password"
                                         type={showPassword ? "text" : "password"}
                                         required
                                         className="w-full bg-bg-tertiary/50 border border-border-primary px-4 py-3 pr-12 outline-none focus:border-copper transition-colors"
@@ -75,6 +112,12 @@ export default function LoginPage() {
                             </div>
                         </div>
 
+                        {state?.error && (
+                            <div className="text-red-500 text-sm">
+                                {state.error}
+                            </div>
+                        )}
+
                         {/* Forgot Password */}
                         <div className="flex justify-end">
                             <Link
@@ -88,11 +131,14 @@ export default function LoginPage() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isPending}
                             className="w-full bg-text-primary text-text-inverted py-4 text-sm uppercase tracking-widest font-medium hover:bg-copper disabled:opacity-50 transition-colors flex items-center justify-center gap-2 group"
                         >
-                            {isLoading ? (
-                                <span>Caricamento...</span>
+                            {isPending ? (
+                                <>
+                                    <span>Caricamento</span>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                </>
                             ) : (
                                 <>
                                     Accedi
@@ -143,3 +189,4 @@ export default function LoginPage() {
         </div>
     );
 }
+

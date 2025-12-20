@@ -104,6 +104,7 @@ export const fragranceAccordsRelations = relations(fragranceAccords, ({ one }) =
 export const reviews = pgTable('reviews', {
     id: uuid('id').defaultRandom().primaryKey(),
     fragranceId: uuid('fragrance_id').references(() => fragrances.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id'), // References auth.users
     userName: text('user_name').notNull(),
     rating: numeric('rating', { precision: 4, scale: 2 }), // 1-5
     comment: text('comment'),
@@ -114,7 +115,9 @@ export const reviews = pgTable('reviews', {
     batchCode: text('batch_code'),
     productionDate: text('production_date'),
     createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at'),
 });
+
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({
     fragrance: one(fragrances, {
@@ -122,5 +125,60 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
         references: [fragrances.id],
     }),
 }));
+
+// --- PROFILES ---
+export const profiles = pgTable('profiles', {
+    id: uuid('id').primaryKey().references(() => authUsers.id, { onDelete: 'cascade' }),
+    username: text('username').unique(),
+    fullName: text('full_name'),
+    avatarUrl: text('avatar_url'),
+    website: text('website'),
+    email: text('email'), // Added for easier lookup
+    updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// --- USER COLLECTION (Armadio) ---
+export const userCollection = pgTable('user_collection', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull(), // References auth.users
+    fragranceId: uuid('fragrance_id').notNull().references(() => fragrances.id, { onDelete: 'cascade' }),
+    quantity: integer('quantity').default(1),
+    size: text('size'), // e.g., "50ml", "100ml"
+    purchaseDate: timestamp('purchase_date'),
+    notes: text('notes'),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const userCollectionRelations = relations(userCollection, ({ one }) => ({
+    fragrance: one(fragrances, {
+        fields: [userCollection.fragranceId],
+        references: [fragrances.id],
+    }),
+}));
+
+// --- USER FAVORITES ---
+export const userFavorites = pgTable('user_favorites', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull(), // References auth.users
+    fragranceId: uuid('fragrance_id').notNull().references(() => fragrances.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
+    fragrance: one(fragrances, {
+        fields: [userFavorites.fragranceId],
+        references: [fragrances.id],
+    }),
+}));
+
+// We need to reference `auth.users` but Drizzle doesn't support cross-schema references easily in the same schema file without defining auth schema. 
+// For now, we assume `id` comes from auth.
+// To make it clean in Drizzle we'd need to define the `auth` schema, but let's just use `uuid('id').primaryKey()` and handle the foreign key in SQL if needed, 
+// though the trigger handles the insertion so we just need the table to exist.
+// Ideally:
+// const authUsers = pgTable('users', { id: uuid('id').primaryKey() }, { schema: 'auth' });
+// But let's keep it simple for now as we don't query auth.users from here usually.
+const authUsers = pgTable('users', { id: uuid('id').primaryKey() });
+
 
 

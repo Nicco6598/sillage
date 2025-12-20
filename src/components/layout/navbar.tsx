@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { surpriseMe } from "@/app/actions/discovery";
-import { Search, Heart, Menu, X, Sparkles, ArrowUpRight } from "lucide-react";
+import { Search, Heart, Menu, X, Sparkles, ArrowUpRight, ArrowRight, User, LogOut, Settings } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { signout } from "@/app/actions/auth";
 
 interface NavItem {
     label: string;
@@ -22,7 +24,7 @@ const navItems: NavItem[] = [
 ];
 
 /**
- * Navbar - 2025 Design aligned with Stone & Silk aesthetic
+ * Navbar - Stone & Silk Design System
  */
 export function Navbar() {
     const router = useRouter();
@@ -30,6 +32,11 @@ export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+
+    // Auth state
+    const [user, setUser] = useState<any>(null);
+    const [username, setUsername] = useState<string>("");
+    const supabase = createClient();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -39,7 +46,6 @@ export function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Lock body scroll when mobile menu is open
     useEffect(() => {
         if (isMobileMenuOpen) {
             document.body.style.overflow = "hidden";
@@ -51,6 +57,30 @@ export function Navbar() {
         };
     }, [isMobileMenuOpen]);
 
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+            if (user?.user_metadata?.username) {
+                setUsername(user.user_metadata.username);
+            } else if (user?.email) {
+                setUsername(user.email.split('@')[0]);
+            }
+        };
+        getUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+            if (session?.user?.user_metadata?.username) {
+                setUsername(session.user.user_metadata.username);
+            } else if (session?.user?.email) {
+                setUsername(session.user.email.split('@')[0]);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [supabase, pathname]);
+
     const handleMobileSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (mobileSearchQuery.trim()) {
@@ -59,6 +89,8 @@ export function Navbar() {
             setMobileSearchQuery("");
         }
     };
+
+    const closeMenu = () => setIsMobileMenuOpen(false);
 
     return (
         <>
@@ -75,12 +107,10 @@ export function Navbar() {
                         "flex items-center justify-between transition-all duration-300",
                         isScrolled ? "h-16" : "h-20"
                     )}>
-                        {/* Logo */}
                         <Link href="/" className="relative z-50">
                             <Logo size="md" className="text-text-primary" />
                         </Link>
 
-                        {/* Desktop Navigation - Centered */}
                         <nav className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href;
@@ -105,7 +135,6 @@ export function Navbar() {
                             })}
                         </nav>
 
-                        {/* Desktop Actions */}
                         <div className="hidden lg:flex items-center gap-2">
                             <Link
                                 href="/explore"
@@ -135,15 +164,18 @@ export function Navbar() {
 
                             <ThemeToggle />
 
-                            <Link
-                                href="/login"
-                                className="ml-4 px-5 py-2 text-xs uppercase tracking-widest border border-text-primary text-text-primary hover:bg-text-primary hover:text-text-inverted transition-colors"
-                            >
-                                Accedi
-                            </Link>
+                            {user ? (
+                                <DesktopUserDropdown user={user} username={username} />
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    className="ml-4 px-5 py-2 text-xs uppercase tracking-widest border border-text-primary text-text-primary hover:bg-text-primary hover:text-text-inverted transition-colors"
+                                >
+                                    Accedi
+                                </Link>
+                            )}
                         </div>
 
-                        {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
                             className="lg:hidden w-10 h-10 flex items-center justify-center text-text-primary"
@@ -155,135 +187,236 @@ export function Navbar() {
                 </div>
             </header>
 
-            {/* Mobile Menu - Full Screen Overlay */}
+            {/* Mobile Menu - Stone & Silk Style */}
             <div
                 className={cn(
                     "fixed inset-0 z-[100] lg:hidden transition-opacity duration-300",
                     isMobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                 )}
             >
-                {/* Backdrop */}
                 <div
                     className="absolute inset-0 bg-bg-primary"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={closeMenu}
                 />
 
-                {/* Menu Content */}
                 <div className={cn(
                     "relative h-full flex flex-col bg-bg-primary transition-transform duration-500",
                     isMobileMenuOpen ? "translate-y-0" : "-translate-y-8"
                 )}>
-                    {/* Mobile Header */}
-                    <div className="flex items-center justify-between px-6 h-16 border-b border-border-primary">
+                    {/* Header - Compact */}
+                    <div className="flex items-center justify-between px-6 h-14 border-b border-border-primary">
                         <Logo size="md" className="text-text-primary" />
                         <button
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="w-10 h-10 flex items-center justify-center text-text-primary hover:bg-bg-tertiary transition-colors"
+                            onClick={closeMenu}
+                            className="w-9 h-9 flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
                             aria-label="Chiudi"
                         >
                             <X className="h-5 w-5" />
                         </button>
                     </div>
 
-                    {/* Mobile Search */}
-                    <div className="px-6 py-6 border-b border-border-primary">
-                        <form onSubmit={handleMobileSearch} className="relative">
-                            <div className="absolute inset-0 bg-bg-tertiary/50 -z-10 border border-border-primary" />
-                            <input
-                                type="text"
-                                value={mobileSearchQuery}
-                                onChange={(e) => setMobileSearchQuery(e.target.value)}
-                                placeholder="Cerca fragranze..."
-                                className="w-full bg-transparent px-4 py-3 pr-12 text-base placeholder:text-text-muted outline-none"
-                            />
-                            <button
-                                type="submit"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-text-muted"
-                            >
-                                <Search className="h-4 w-4" />
-                            </button>
-                        </form>
+                    {/* Main Content - Scrollable */}
+                    <div className="flex-1 overflow-y-auto">
+                        {/* HERO: User Section - PROMINENT */}
+                        {user ? (
+                            <div className="px-6 py-8 border-b border-border-primary">
+                                <Link
+                                    href="/profile"
+                                    onClick={closeMenu}
+                                    className="group flex items-center gap-5 hover:opacity-80 transition-opacity"
+                                >
+                                    <div className="w-16 h-16 border border-copper bg-copper/10 flex items-center justify-center text-copper">
+                                        <User className="h-7 w-7" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-serif text-3xl group-hover:text-copper transition-colors">{username}</p>
+                                        <p className="text-sm text-text-muted mt-1">Vai al tuo profilo →</p>
+                                    </div>
+                                </Link>
+                                {/* User Quick Actions */}
+                                <div className="flex items-center gap-3 mt-5 pt-5 border-t border-border-secondary/30">
+                                    <Link
+                                        href="/settings"
+                                        onClick={closeMenu}
+                                        className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-mono uppercase tracking-widest text-text-muted hover:text-copper border border-border-secondary/50 hover:border-copper transition-colors"
+                                    >
+                                        <Settings className="h-3.5 w-3.5" />
+                                        Impostazioni
+                                    </Link>
+                                    <form action={signout} className="flex-1">
+                                        <button
+                                            type="submit"
+                                            className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-mono uppercase tracking-widest text-red-500/70 hover:text-red-500 border border-red-500/20 hover:border-red-500/50 transition-colors"
+                                        >
+                                            <LogOut className="h-3.5 w-3.5" />
+                                            Esci
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="px-6 py-8 border-b border-border-primary">
+                                <h2 className="font-serif text-3xl mb-3">
+                                    Benvenuto<span className="text-copper">.</span>
+                                </h2>
+                                <p className="text-text-secondary mb-6">Accedi per esplorare la tua collezione.</p>
+                                <Link
+                                    href="/login"
+                                    onClick={closeMenu}
+                                    className="group inline-flex items-center gap-3 px-6 py-4 bg-text-primary text-text-inverted hover:bg-copper transition-colors"
+                                >
+                                    <span className="text-xs font-medium uppercase tracking-widest">Accedi</span>
+                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* NAVIGATION - PROMINENT */}
+                        <nav className="px-6 py-6">
+                            <div className="space-y-0">
+                                {[{ label: "Home", href: "/" }, ...navItems].map((item, index) => {
+                                    const isActive = pathname === item.href;
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={closeMenu}
+                                            className={cn(
+                                                "group flex items-center justify-between py-5 border-b border-border-secondary/30 transition-colors",
+                                                isActive ? "border-copper" : "hover:border-copper"
+                                            )}
+                                        >
+                                            <div className="flex items-baseline gap-4">
+                                                <span className={cn(
+                                                    "text-xs font-mono",
+                                                    isActive ? "text-copper" : "text-text-muted"
+                                                )}>
+                                                    0{index + 1}
+                                                </span>
+                                                <span className={cn(
+                                                    "font-serif text-3xl transition-colors",
+                                                    isActive ? "text-copper" : "text-text-primary group-hover:text-copper"
+                                                )}>
+                                                    {item.label}
+                                                </span>
+                                            </div>
+                                            <ArrowUpRight className={cn(
+                                                "h-5 w-5 transition-all",
+                                                isActive
+                                                    ? "text-copper opacity-100"
+                                                    : "text-text-muted opacity-0 group-hover:opacity-100 group-hover:text-copper"
+                                            )} />
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </nav>
                     </div>
 
-                    {/* Navigation Links */}
-                    <nav className="flex-1 overflow-y-auto px-6 py-8">
-                        <div className="space-y-2">
-                            {[{ label: "Home", href: "/" }, ...navItems].map((item, index) => {
-                                const isActive = pathname === item.href;
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className={cn(
-                                            "group flex items-center justify-between py-4 border-b border-border-secondary/50 transition-colors",
-                                            isActive ? "border-copper" : "hover:border-copper"
-                                        )}
-                                    >
-                                        <div className="flex items-baseline gap-4">
-                                            <span className={cn(
-                                                "text-xs font-mono",
-                                                isActive ? "text-copper" : "text-text-muted"
-                                            )}>
-                                                0{index + 1}
-                                            </span>
-                                            <span className={cn(
-                                                "font-serif text-2xl transition-colors",
-                                                isActive ? "text-copper" : "text-text-primary group-hover:text-copper"
-                                            )}>
-                                                {item.label}
-                                            </span>
-                                        </div>
-                                        <ArrowUpRight className={cn(
-                                            "h-4 w-4 transition-all",
-                                            isActive
-                                                ? "text-copper opacity-100"
-                                                : "text-text-muted opacity-0 group-hover:opacity-100 group-hover:text-copper"
-                                        )} />
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    </nav>
-
-                    {/* Mobile Footer */}
-                    <div className="px-6 py-6 border-t border-border-primary bg-bg-secondary/30">
-                        {/* Actions Row */}
-                        <div className="flex items-center gap-4 mb-6">
-                            <Link
-                                href="/favorites"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex-1 flex items-center justify-center gap-2 py-3 border border-border-primary text-sm hover:border-copper hover:text-copper transition-colors"
-                            >
-                                <Heart className="h-4 w-4" />
-                                <span>Preferiti</span>
-                            </Link>
-
-                            <button
-                                onClick={() => {
-                                    setIsMobileMenuOpen(false);
-                                    surpriseMe();
-                                }}
-                                className="flex-1 flex items-center justify-center gap-2 py-3 border border-border-primary text-sm hover:border-gold hover:text-gold transition-colors cursor-pointer"
-                            >
-                                <Sparkles className="h-4 w-4" />
-                                <span>Random</span>
-                            </button>
-
-                            <ThemeToggle />
+                    {/* Footer - MINIMAL */}
+                    <div className="border-t border-border-primary bg-bg-secondary/20">
+                        {/* Search - Compact */}
+                        <div className="px-6 py-3 border-b border-border-secondary/30">
+                            <form onSubmit={handleMobileSearch} className="relative">
+                                <input
+                                    type="text"
+                                    value={mobileSearchQuery}
+                                    onChange={(e) => setMobileSearchQuery(e.target.value)}
+                                    placeholder="Cerca..."
+                                    className="w-full bg-transparent border-none px-0 py-2 text-sm placeholder:text-text-muted outline-none"
+                                />
+                                <Search className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
+                            </form>
                         </div>
 
-                        {/* Login Button */}
-                        <Link
-                            href="/login"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex w-full items-center justify-center py-4 bg-text-primary text-text-inverted text-sm uppercase tracking-widest hover:bg-copper transition-colors"
-                        >
-                            Accedi
-                        </Link>
+                        {/* Quick Actions - Very Small */}
+                        <div className="px-6 py-3 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <Link
+                                    href="/favorites"
+                                    onClick={closeMenu}
+                                    className="text-text-muted hover:text-copper transition-colors"
+                                    aria-label="Preferiti"
+                                >
+                                    <Heart className="h-4 w-4" />
+                                </Link>
+                                <button
+                                    onClick={() => { closeMenu(); surpriseMe(); }}
+                                    className="text-text-muted hover:text-gold transition-colors"
+                                    aria-label="Random"
+                                >
+                                    <Sparkles className="h-4 w-4" />
+                                </button>
+                                <ThemeToggle />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </>
+    );
+}
+
+function DesktopUserDropdown({ user, username }: { user: any; username: string }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="relative ml-4">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center gap-2 px-3 py-2 border border-transparent hover:bg-bg-tertiary transition-colors"
+            >
+                <div className="w-8 h-8 border border-copper/30 bg-copper/5 flex items-center justify-center text-copper">
+                    <User className="h-4 w-4" />
+                </div>
+                <span className="text-sm hidden md:block">{username}</span>
+            </button>
+
+            {isOpen && (
+                <>
+                    <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setIsOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-56 bg-bg-primary border border-border-primary shadow-xl z-50 overflow-hidden">
+                        <div className="p-3 border-b border-border-primary bg-bg-secondary/30">
+                            <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1">Account</p>
+                            <p className="text-sm truncate">{user.email}</p>
+                        </div>
+
+                        <div className="py-1">
+                            <Link
+                                href="/profile"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-bg-tertiary transition-colors"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <User className="h-4 w-4 text-text-secondary" />
+                                Profilo
+                            </Link>
+                            <Link
+                                href="/settings"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-bg-tertiary transition-colors"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <Settings className="h-4 w-4 text-text-secondary" />
+                                Impostazioni
+                            </Link>
+                        </div>
+
+                        <div className="border-t border-border-primary py-1">
+                            <form action={signout}>
+                                <button
+                                    type="submit"
+                                    className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/5 transition-colors"
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                    Esci
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
     );
 }

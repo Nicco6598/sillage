@@ -1,15 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Eye, EyeOff, ArrowRight, Check } from "lucide-react";
+import { useState, useActionState, useEffect } from "react";
+import { Eye, EyeOff, ArrowRight, Check, Loader2 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
+import { signup } from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+    const [state, action, isPending] = useActionState(signup, undefined);
+    const router = useRouter();
+    const supabase = createClient();
+
+    useEffect(() => {
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                router.replace('/');
+            }
+        };
+        checkSession();
+    }, [router, supabase]);
 
     const requirements = [
         { label: "8+ caratteri", met: formData.password.length >= 8 },
@@ -18,14 +33,6 @@ export default function RegisterPage() {
     ];
 
     const allRequirementsMet = requirements.every(r => r.met);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!allRequirementsMet) return;
-        setIsLoading(true);
-        // Simulate loading
-        setTimeout(() => setIsLoading(false), 1500);
-    };
 
     return (
         <div className="min-h-screen flex">
@@ -59,20 +66,21 @@ export default function RegisterPage() {
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                    <form action={action} className="space-y-8">
                         <div className="space-y-6">
-                            {/* Name */}
+                            {/* Username */}
                             <div className="group">
                                 <label className="block text-xs font-mono uppercase tracking-widest text-text-muted mb-3 group-focus-within:text-copper transition-colors">
-                                    Nome
+                                    Username
                                 </label>
                                 <input
+                                    name="username"
                                     type="text"
                                     required
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    value={formData.username}
+                                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                     className="w-full bg-bg-tertiary/50 border border-border-primary px-4 py-3 outline-none focus:border-copper transition-colors"
-                                    placeholder="Il tuo nome"
+                                    placeholder="Il tuo username"
                                 />
                             </div>
 
@@ -82,6 +90,7 @@ export default function RegisterPage() {
                                     Email
                                 </label>
                                 <input
+                                    name="email"
                                     type="email"
                                     required
                                     value={formData.email}
@@ -98,6 +107,7 @@ export default function RegisterPage() {
                                 </label>
                                 <div className="relative">
                                     <input
+                                        name="password"
                                         type={showPassword ? "text" : "password"}
                                         required
                                         value={formData.password}
@@ -137,14 +147,28 @@ export default function RegisterPage() {
                             </div>
                         </div>
 
+                        {state?.error && (
+                            <div className="text-red-500 text-sm">
+                                {state.error}
+                            </div>
+                        )}
+                        {state?.message && (
+                            <div className="text-green-500 text-sm">
+                                {state.message}
+                            </div>
+                        )}
+
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={isLoading || !allRequirementsMet}
+                            disabled={isPending || !allRequirementsMet}
                             className="w-full bg-text-primary text-text-inverted py-4 text-sm uppercase tracking-widest font-medium hover:bg-copper disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 group"
                         >
-                            {isLoading ? (
-                                <span>Creazione account...</span>
+                            {isPending ? (
+                                <>
+                                    <span>Creazione account...</span>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                </>
                             ) : (
                                 <>
                                     Crea Account
@@ -195,3 +219,4 @@ export default function RegisterPage() {
         </div>
     );
 }
+

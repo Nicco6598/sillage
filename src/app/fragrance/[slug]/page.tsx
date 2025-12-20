@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Star, Heart, Share2, Package, Calendar } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, ArrowUpRight, Star } from "lucide-react";
 import { getFragranceBySlug, getFragranceReviews } from "@/lib/fragrance-db";
 import { notFound } from "next/navigation";
 import { ReviewAction } from "@/components/fragrance/review-action";
@@ -7,6 +8,9 @@ import { DynamicPerformance } from "@/components/fragrance/dynamic-performance";
 import { SeasonVotes } from "@/components/fragrance/season-votes";
 import { RecentlyViewedTracker } from "@/components/features/recently-viewed-tracker";
 import { RecentlyViewed } from "@/components/features/recently-viewed";
+import { CollectionActions } from "@/components/fragrance/collection-actions";
+import { ReviewsList } from "@/components/fragrance/reviews-list";
+import { createClient } from "@/lib/supabase/server";
 
 interface FragrancePageProps {
     params: Promise<{ slug: string }>;
@@ -21,6 +25,11 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
     }
 
     const reviews = await getFragranceReviews(fragrance.id);
+
+    // Get current user for review ownership
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const currentUserId = user?.id || null;
 
     return (
         <div className="w-full pt-32 md:pt-40 pb-24">
@@ -51,11 +60,13 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                         {/* Bottle Image */}
                         <div className="aspect-[3/4] bg-bg-secondary border border-border-primary relative overflow-hidden mb-6 group rounded-sm ring-1 ring-inset ring-white/5">
                             {fragrance.imageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
+                                <Image
                                     src={fragrance.imageUrl}
                                     alt={fragrance.name}
-                                    className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-105"
+                                    fill
+                                    priority
+                                    className="object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-105"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
                                 />
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center">
@@ -70,39 +81,8 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                             )}
                         </div>
 
-                        {/* Collection Actions */}
-                        <div className="grid grid-cols-3 gap-3 mb-6">
-                            <button className="py-4 border border-border-primary hover:border-copper hover:text-copper transition-colors flex flex-col items-center gap-2 group cursor-pointer">
-                                <span className="text-xl">👃</span>
-                                <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted group-hover:text-copper">
-                                    Lo ho
-                                </span>
-                            </button>
-                            <button className="py-4 border border-border-primary hover:border-rose-gold hover:text-rose-gold transition-colors flex flex-col items-center gap-2 group cursor-pointer">
-                                <span className="text-xl">💖</span>
-                                <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted group-hover:text-rose-gold">
-                                    Lo voglio
-                                </span>
-                            </button>
-                            <button className="py-4 border border-border-primary hover:border-gold hover:text-gold transition-colors flex flex-col items-center gap-2 group cursor-pointer">
-                                <span className="text-xl">✅</span>
-                                <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted group-hover:text-gold">
-                                    Lo avevo
-                                </span>
-                            </button>
-                        </div>
-
-                        {/* Secondary Actions */}
-                        <div className="flex gap-3">
-                            <button className="flex-1 py-3 border border-border-primary hover:border-copper transition-colors flex items-center justify-center gap-2 cursor-pointer text-sm text-text-secondary hover:text-copper">
-                                <Share2 className="h-4 w-4" />
-                                Condividi
-                            </button>
-                            <button className="flex-1 py-3 border border-border-primary hover:border-copper transition-colors flex items-center justify-center gap-2 cursor-pointer text-sm text-text-secondary hover:text-copper">
-                                <Heart className="h-4 w-4" />
-                                Preferiti
-                            </button>
-                        </div>
+                        {/* Collection Actions - Interactive Component */}
+                        <CollectionActions fragranceId={fragrance.id} />
                     </div>
 
                     {/* RIGHT COLUMN: Info */}
@@ -295,99 +275,13 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                             <p className="font-serif text-2xl">Sii il primo a recensire {fragrance.name}!</p>
                         </div>
                     ) : (
-                        <div className="space-y-6">
-                            {reviews.map((review) => (
-                                <div key={review.id} className="border border-border-primary p-6 hover:border-copper/30 transition-colors">
-                                    {/* Review Header */}
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-bg-tertiary border border-border-primary flex items-center justify-center text-xl uppercase font-serif">
-                                                {review.userName.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">{review.userName}</p>
-                                                <p className="text-xs text-text-muted font-mono">
-                                                    {review.createdAt ? new Date(review.createdAt).toLocaleDateString('it-IT', {
-                                                        day: 'numeric',
-                                                        month: 'long',
-                                                        year: 'numeric'
-                                                    }) : ""}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <span className="font-serif text-xl text-copper mr-2">{Number(review.rating).toFixed(1)}</span>
-                                            {[1, 2, 3, 4, 5].map((i) => (
-                                                <Star
-                                                    key={i}
-                                                    className={`h-4 w-4 ${i <= Math.round(Number(review.rating) || 0)
-                                                        ? "fill-copper text-copper"
-                                                        : "text-border-primary"
-                                                        }`}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Batch Info */}
-                                    {(review.batchCode || review.productionDate) && (
-                                        <div className="flex items-center gap-4 mb-4 p-3 bg-bg-tertiary/50 border border-border-primary">
-                                            {review.batchCode && (
-                                                <div className="flex items-center gap-2">
-                                                    <Package className="h-4 w-4 text-gold" />
-                                                    <span className="text-xs font-mono uppercase tracking-wider">
-                                                        Batch: <span className="text-text-primary">{review.batchCode}</span>
-                                                    </span>
-                                                </div>
-                                            )}
-                                            {review.productionDate && (
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4 text-rose-gold" />
-                                                    <span className="text-xs font-mono uppercase tracking-wider">
-                                                        Prod: <span className="text-text-primary">{review.productionDate}</span>
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* Comment */}
-                                    {review.comment && (
-                                        <p className="text-text-secondary leading-relaxed mb-6">
-                                            "{review.comment}"
-                                        </p>
-                                    )}
-
-                                    {/* Detailed Ratings */}
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        {review.sillage && (
-                                            <div className="p-3 bg-bg-secondary text-center">
-                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Sillage</p>
-                                                <p className="text-lg font-mono text-copper">{review.sillage}<span className="text-text-muted text-sm">/5</span></p>
-                                            </div>
-                                        )}
-                                        {review.longevity && (
-                                            <div className="p-3 bg-bg-secondary text-center">
-                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Longevità</p>
-                                                <p className="text-lg font-mono text-gold">{review.longevity}<span className="text-text-muted text-sm">/5</span></p>
-                                            </div>
-                                        )}
-                                        {review.genderVote && (
-                                            <div className="p-3 bg-bg-secondary text-center">
-                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Genere</p>
-                                                <p className="text-sm capitalize">{review.genderVote}</p>
-                                            </div>
-                                        )}
-                                        {review.seasonVote && (
-                                            <div className="p-3 bg-bg-secondary text-center">
-                                                <p className="text-[10px] uppercase tracking-widest text-text-muted mb-1">Stagione</p>
-                                                <p className="text-sm capitalize">{review.seasonVote.replace(/,/g, ', ')}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <ReviewsList
+                            reviews={reviews}
+                            currentUserId={currentUserId}
+                            fragranceId={fragrance.id}
+                            fragranceSlug={fragrance.slug}
+                            fragranceName={fragrance.name}
+                        />
                     )}
                 </div>
             </div>

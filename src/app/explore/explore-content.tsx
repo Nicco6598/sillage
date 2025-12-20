@@ -504,11 +504,12 @@ function FragranceCard({ fragrance }: { fragrance: Fragrance }) {
         >
             <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-4 group/image ring-1 ring-inset ring-white/10 rounded-sm">
                 {fragrance.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                         src={fragrance.imageUrl}
                         alt={fragrance.name}
-                        className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-110"
+                        fill
+                        className="object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                 ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-bg-secondary to-bg-tertiary" />

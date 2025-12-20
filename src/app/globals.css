@@ -5,55 +5,56 @@
    "Stone & Silk" Palette | Pure Black Dark Mode
    ============================================ */
 
-/* Light Theme (Premium Neutrals) */
+/* Light Theme (Premium Neutrals - Sand/Stone Base) */
 :root {
-  /* Background Colors */
-  --bg-primary: 255 255 255;
-  --bg-secondary: 250 249 246;
-  /* Off-White / Alabaster #FAF9F6 */
-  --bg-tertiary: 235 235 230;
-  /* Warm Stone #EBEBE6 */
-  --bg-elevated: 255 255 255;
+  /* Background Colors - Darker Sand/Stone palette */
+  --bg-primary: 238 235 228;
+  /* Warm Sand #EEEBE4 */
+  --bg-secondary: 230 226 218;
+  /* Parchment #E6E2DA */
+  --bg-tertiary: 218 214 205;
+  /* Stone #DAD6CD */
+  --bg-elevated: 245 242 236;
+  /* Lighter for elevated elements */
 
-  /* Foreground/Text Colors */
-  --text-primary: 0 0 0;
-  /* Pure Black - Sharp contrast */
-  --text-secondary: 60 60 55;
-  /* Warm Dark Grey */
-  --text-tertiary: 100 100 95;
-  /* Medium Stone */
-  --text-muted: 150 150 145;
-  /* Light Stone */
+  /* Foreground/Text Colors - High contrast */
+  --text-primary: 15 15 12;
+  /* Near Black */
+  --text-secondary: 40 40 35;
+  /* Dark Brown-Grey */
+  --text-tertiary: 65 65 60;
+  /* Medium Grey */
+  --text-muted: 95 95 88;
+  /* Darker muted for readability */
   --text-inverted: 255 255 255;
 
   /* Accent Colors */
-  --accent: 140 130 115;
-  /* Metallic Bronze/Taupe #8C8273 */
-  --accent-highlight: 210 205 195;
-  /* Champagne #D2CDC3 */
+  --accent: 100 90 80;
+  /* Dark Bronze */
+  --accent-highlight: 170 165 155;
+  /* Muted Champagne */
 
-  /* Metallic Accents */
-  --color-copper: 168 100 70;
-  /* Rich Copper */
-  --color-gold: 173 138 59;
-  /* Antique Gold */
-  --color-rose-gold: 191 120 125;
-  /* Dusty Rose Gold */
+  /* Metallic Accents - Rich and vibrant */
+  --color-copper: 145 75 45;
+  /* Deep Copper #91452D */
+  --color-gold: 140 105 30;
+  /* Rich Gold #8C691E */
+  --color-rose-gold: 155 85 90;
+  /* Deep Rose #9B555A */
 
-  /* Borders */
-  --border-primary: 230 230 225;
-  /* Very Light Warm Grey */
-  --border-secondary: 200 200 195;
-  /* Light Warm Grey */
-  --border-strong: 0 0 0;
-  /* Black */
+  /* Borders - Strong visibility */
+  --border-primary: 195 190 180;
+  /* Visible Warm Grey */
+  --border-secondary: 170 165 155;
+  /* Medium Stone */
+  --border-strong: 15 15 12;
+  /* Near Black */
 
   /* Status Colors */
-  --status-success: 70 85 75;
-  /* Muted Green */
-  --status-warning: 180 83 9;
-  --status-error: 185 28 28;
-  --status-info: 60 60 60;
+  --status-success: 50 70 55;
+  --status-warning: 150 65 5;
+  --status-error: 150 25 25;
+  --status-info: 40 40 40;
 
   --radius-sm: 0px;
   --radius-md: 2px;
@@ -312,4 +313,28 @@ body {
 
 .animate-slide-in-right {
   animation: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
 }
