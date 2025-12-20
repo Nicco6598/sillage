@@ -7,6 +7,7 @@ export interface RecentFragrance {
     slug: string;
     name: string;
     brandName: string;
+    imageUrl: string | null;
     timestamp: number;
 }
 

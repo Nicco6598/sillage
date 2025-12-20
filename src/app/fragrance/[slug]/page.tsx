@@ -212,7 +212,7 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                                                 <Link
                                                     key={n.id}
                                                     href={`/explore?note=${n.name}`}
-                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors"
+                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors capitalize"
                                                 >
                                                     {n.name}
                                                 </Link>
@@ -234,7 +234,7 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                                                 <Link
                                                     key={n.id}
                                                     href={`/explore?note=${n.name}`}
-                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors"
+                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors capitalize"
                                                 >
                                                     {n.name}
                                                 </Link>
@@ -256,7 +256,7 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                                                 <Link
                                                     key={n.id}
                                                     href={`/explore?note=${n.name}`}
-                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors"
+                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors capitalize"
                                                 >
                                                     {n.name}
                                                 </Link>
@@ -275,10 +275,10 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                 </div>
 
                 {/* REVIEWS SECTION */}
-                <div className="mt-24">
-                    <div className="flex items-center justify-between mb-10 pb-6 border-b border-border-primary">
+                <div className="mt-24 mb-32">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-6 border-b border-border-primary">
                         <div className="flex items-center gap-4">
-                            <div className="w-8 h-px bg-copper" />
+                            <div className="hidden sm:block w-8 h-px bg-copper" />
                             <h2 className="font-serif text-3xl md:text-4xl">Recensioni</h2>
                             <span className="text-sm text-text-muted">({reviews.length})</span>
                         </div>
@@ -396,6 +396,7 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                 slug={fragrance.slug}
                 name={fragrance.name}
                 brandName={fragrance.brand.name}
+                imageUrl={fragrance.imageUrl}
             />
 
             <RecentlyViewed />

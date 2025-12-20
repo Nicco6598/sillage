@@ -336,7 +336,7 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                                                     <Link
                                                         key={note.id}
                                                         href={`/notes/${note.id}`}
-                                                        className="rounded-full bg-accent/20 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-white"
+                                                        className="rounded-full bg-accent/20 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-white capitalize"
                                                     >
                                                         {note.name}
                                                     </Link>
@@ -362,7 +362,7 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                                                     <Link
                                                         key={note.id}
                                                         href={`/notes/${note.id}`}
-                                                        className="rounded-full bg-accent-secondary/20 px-3 py-1.5 text-sm font-medium text-accent-secondary transition-colors hover:bg-accent-secondary hover:text-white"
+                                                        className="rounded-full bg-accent-secondary/20 px-3 py-1.5 text-sm font-medium text-accent-secondary transition-colors hover:bg-accent-secondary hover:text-white capitalize"
                                                     >
                                                         {note.name}
                                                     </Link>
@@ -388,7 +388,7 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                                                     <Link
                                                         key={note.id}
                                                         href={`/notes/${note.id}`}
-                                                        className="rounded-full bg-accent-tertiary/20 px-3 py-1.5 text-sm font-medium text-accent-tertiary transition-colors hover:bg-accent-tertiary hover:text-white"
+                                                        className="rounded-full bg-accent-tertiary/20 px-3 py-1.5 text-sm font-medium text-accent-tertiary transition-colors hover:bg-accent-tertiary hover:text-white capitalize"
                                                     >
                                                         {note.name}
                                                     </Link>

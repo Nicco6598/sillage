@@ -17,7 +17,7 @@ export function ReviewAction({ fragranceId, fragranceSlug, fragranceName }: Revi
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="inline-block border border-text-primary px-8 py-3 text-sm uppercase tracking-widest hover:bg-text-primary hover:text-bg-primary transition-colors cursor-pointer"
+                className="w-full sm:w-auto border border-text-primary px-6 py-4 sm:py-3 text-[10px] sm:text-xs uppercase tracking-[0.2em] hover:bg-text-primary hover:text-bg-primary transition-all duration-300 cursor-pointer text-center"
             >
                 Scrivi una recensione
             </button>

@@ -203,10 +203,10 @@ export function ExploreContent({
                         <FilterChip label={currentFilters.brand} onRemove={() => removeFilter("brand")} />
                     )}
                     {currentFilters.note && (
-                        <FilterChip label={currentFilters.note} onRemove={() => removeFilter("note")} />
+                        <FilterChip label={currentFilters.note} onRemove={() => removeFilter("note")} className="capitalize" />
                     )}
                     {currentFilters.accord && (
-                        <FilterChip label={currentFilters.accord} onRemove={() => removeFilter("accord")} />
+                        <FilterChip label={currentFilters.accord} onRemove={() => removeFilter("accord")} className="capitalize" />
                     )}
                     <button
                         onClick={clearFilters}
@@ -429,7 +429,7 @@ export function ExploreContent({
                                                     : "hover:bg-bg-secondary"
                                             )}
                                         >
-                                            <span className="text-sm">{accord}</span>
+                                            <span className="text-sm capitalize">{accord}</span>
                                             {localFilters.accord === accord && <Check className="h-4 w-4" />}
                                         </button>
                                     ))}
@@ -464,7 +464,7 @@ export function ExploreContent({
                                                     : "hover:bg-bg-secondary"
                                             )}
                                         >
-                                            <span className="text-sm">{note}</span>
+                                            <span className="text-sm capitalize">{note}</span>
                                             {localFilters.note === note && <Check className="h-4 w-4" />}
                                         </button>
                                     ))}
@@ -559,9 +559,12 @@ function FragranceCard({ fragrance }: { fragrance: Fragrance }) {
 }
 
 // Filter Chip Component
-function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+function FilterChip({ label, onRemove, className }: { label: string; onRemove: () => void; className?: string }) {
     return (
-        <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-copper/10 text-xs uppercase tracking-widest border border-copper/20 text-copper">
+        <span className={cn(
+            "inline-flex items-center gap-2 px-3 py-1.5 bg-copper/10 text-xs uppercase tracking-widest border border-copper/20 text-copper",
+            className
+        )}>
             {label}
             <button onClick={onRemove} className="hover:bg-copper/20 -mr-1 p-0.5 transition-colors">
                 <X className="h-3 w-3" />
