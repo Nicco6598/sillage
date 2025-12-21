@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useActionState, useEffect } from "react";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { InlineLoader } from "@/components/ui/perfume-loader";
 import { login } from "@/app/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -38,17 +39,7 @@ export default function LoginPage() {
 
     // Fullscreen loading overlay
     if (isLoggingIn) {
-        return (
-            <div className="fixed inset-0 bg-bg-primary z-50 flex flex-col items-center justify-center">
-                <Logo size="lg" />
-                <div className="mt-8 flex flex-col items-center gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-copper" />
-                    <p className="text-text-secondary font-mono text-sm uppercase tracking-widest">
-                        Accesso in corso...
-                    </p>
-                </div>
-            </div>
-        );
+        return <InlineLoader message="Accesso in corso..." />;
     }
 
     return (
@@ -118,8 +109,19 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        {/* Forgot Password */}
-                        <div className="flex justify-end">
+                        {/* Remember Me + Forgot Password */}
+                        <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-3 cursor-pointer group">
+                                <input
+                                    name="rememberMe"
+                                    type="checkbox"
+                                    defaultChecked
+                                    className="w-4 h-4 border border-border-primary bg-bg-tertiary/50 appearance-none checked:bg-copper checked:border-copper cursor-pointer transition-colors"
+                                />
+                                <span className="text-xs text-text-muted group-hover:text-text-primary transition-colors">
+                                    Ricordami
+                                </span>
+                            </label>
                             <Link
                                 href="/forgot-password"
                                 className="text-xs text-text-muted hover:text-copper transition-colors"

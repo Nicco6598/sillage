@@ -109,18 +109,21 @@ export default async function Home() {
               <Link
                 key={brand.id}
                 href={`/brands/${brand.slug}`}
-                className="group relative p-8 border border-border-primary bg-bg-secondary/30 hover:border-copper transition-all duration-300"
+                className="group relative p-8 border border-border-primary bg-bg-secondary/30 hover:border-copper transition-all duration-300 card-3d"
               >
+                {/* Subtle depth gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
+
                 {/* Number */}
-                <span className="absolute top-4 left-4 text-xs font-mono text-text-muted">
+                <span className="absolute top-4 left-4 text-xs font-mono text-text-muted z-10">
                   0{i + 1}
                 </span>
 
                 {/* Arrow */}
-                <ArrowUpRight className="absolute top-4 right-4 h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 group-hover:text-copper transition-all" />
+                <ArrowUpRight className="absolute top-4 right-4 h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 group-hover:text-copper transition-all z-10" />
 
                 {/* Content */}
-                <div className="pt-8">
+                <div className="pt-8 relative z-10">
                   <h3 className="font-serif text-2xl mb-2 group-hover:text-copper transition-colors">
                     {brand.name}
                   </h3>
@@ -153,10 +156,12 @@ export default async function Home() {
             {/* Explore Fragrances */}
             <Link
               href="/explore"
-              className="group relative h-64 md:h-80 overflow-hidden bg-bg-primary border border-border-primary hover:border-copper transition-colors"
+              className="group relative h-64 md:h-80 overflow-hidden bg-bg-primary border border-border-primary hover:border-copper shadow-soft hover:shadow-elevated transition-all duration-300 hover:-translate-y-0.5"
             >
+              {/* Depth gradient */}
+              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
               <div className="absolute inset-0 bg-gradient-to-br from-copper/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <div className="absolute inset-0 flex flex-col justify-end p-8 relative z-10">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-2">
                   {stats.fragrances.toLocaleString()}+ profumi
                 </span>
@@ -173,10 +178,12 @@ export default async function Home() {
             {/* Notes */}
             <Link
               href="/notes"
-              className="group relative h-64 md:h-80 overflow-hidden bg-bg-tertiary border border-border-primary hover:border-gold transition-colors"
+              className="group relative h-64 md:h-80 overflow-hidden bg-bg-tertiary border border-border-primary hover:border-gold shadow-soft hover:shadow-elevated transition-all duration-300 hover:-translate-y-0.5"
             >
+              {/* Depth gradient */}
+              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
               <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <div className="absolute inset-0 flex flex-col justify-end p-8 relative z-10">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-2">
                   {stats.notes.toLocaleString()}+ ingredienti
                 </span>

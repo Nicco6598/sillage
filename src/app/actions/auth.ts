@@ -1,14 +1,23 @@
 
 'use server'
 
-
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db-schema";
 import { eq } from "drizzle-orm";
+import {
+    normalizeEmail,
+    validateEmail,
+    getEmailForDuplicateCheck
+} from "@/lib/email-validation";
+import {
+    checkSignupRateLimit,
+    getTimeUntilReset
+} from "@/lib/rate-limit";
 
 const loginIdentifierSchema = z.string().min(1, "Email o username richiesto");
 const loginSchema = z.object({
@@ -18,8 +27,17 @@ const loginSchema = z.object({
 
 const signupSchema = z.object({
     email: z.string().email("Email non valida"),
-    password: z.string().min(6, "La password deve essere di almeno 6 caratteri"),
-    username: z.string().min(3, "L'username deve essere di almeno 3 caratteri").regex(/^[a-zA-Z0-9_]+$/, "L'username può contenere solo lettere, numeri e underscore"),
+    password: z.string()
+        .min(8, "La password deve essere di almeno 8 caratteri")
+        .regex(/[A-Z]/, "La password deve contenere almeno una maiuscola")
+        .regex(/\d/, "La password deve contenere almeno un numero"),
+    confirmPassword: z.string().min(1, "Conferma la password"),
+    username: z.string()
+        .min(3, "L'username deve essere di almeno 3 caratteri")
+        .regex(/^[a-zA-Z0-9_]+$/, "L'username può contenere solo lettere, numeri e underscore"),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Le password non corrispondono",
+    path: ["confirmPassword"],
 })
 
 export type AuthState = {
@@ -72,13 +90,11 @@ export async function login(prevState: AuthState | undefined, formData: FormData
     })
 
     if (error) {
-        // Generico errore per sicurezza o specifico se preferito
-        return { error: error.message } // "Credenziali non valide"
+        return { error: error.message }
     }
 
     revalidatePath('/', 'layout')
     redirect('/')
-    // Redirect throws, so this line is unreachable, but TypeScript might want a return type consistent if redirect wasn't called (which it is).
 }
 
 export async function signup(prevState: AuthState | undefined, formData: FormData): Promise<AuthState> {
@@ -87,16 +103,49 @@ export async function signup(prevState: AuthState | undefined, formData: FormDat
     const rawData = {
         email: formData.get('email') as string,
         password: formData.get('password') as string,
+        confirmPassword: formData.get('confirmPassword') as string,
         username: formData.get('username') as string,
     }
 
+    // === 1. BASIC VALIDATION ===
     const validatedFields = signupSchema.safeParse(rawData)
 
     if (!validatedFields.success) {
         return { error: validatedFields.error.issues[0].message }
     }
 
-    // Check if username check... (keep existing)
+    // === 2. EMAIL VALIDATION (Disposable check) ===
+    const emailValidationError = validateEmail(rawData.email);
+    if (emailValidationError) {
+        return { error: emailValidationError }
+    }
+
+    // === 3. RATE LIMITING (IP-based) ===
+    try {
+        const headersList = await headers();
+        // Get IP from various headers (Vercel, Cloudflare, etc.)
+        const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim()
+            || headersList.get('x-real-ip')
+            || headersList.get('cf-connecting-ip')
+            || 'unknown';
+
+        const rateLimitResult = await checkSignupRateLimit(ip);
+
+        if (!rateLimitResult.success) {
+            const timeLeft = getTimeUntilReset(rateLimitResult.reset);
+            return {
+                error: `Troppi tentativi di registrazione. Riprova tra ${timeLeft}.`
+            }
+        }
+    } catch (error) {
+        console.error("Rate limit check error:", error);
+        // Continue on rate limit errors (fail open for UX)
+    }
+
+    // === 4. NORMALIZE EMAIL for duplicate check ===
+    const normalizedEmail = getEmailForDuplicateCheck(rawData.email);
+
+    // === 5. CHECK USERNAME UNIQUENESS ===
     try {
         const existingUser = await db.select().from(profiles).where(eq(profiles.username, rawData.username)).limit(1);
         if (existingUser.length > 0) {
@@ -106,23 +155,35 @@ export async function signup(prevState: AuthState | undefined, formData: FormDat
         console.error("Error checking username:", error);
     }
 
-    // Check if email is taken (via profiles check as proxy, Supabase also checks but this gives custom error early)
+    // === 6. CHECK EMAIL UNIQUENESS (with normalization) ===
+    // We need to check if any existing email, when normalized, matches our normalized email
     try {
-        const existingEmail = await db.select().from(profiles).where(eq(profiles.email, rawData.email)).limit(1);
-        if (existingEmail.length > 0) {
-            return { error: "Questa email è già registrata. Effettua il login." }
+        // Get all emails from profiles (for small user bases this is fine)
+        // For large scale, consider adding a normalized_email column
+        const allProfiles = await db.select({ email: profiles.email }).from(profiles).limit(1000);
+
+        for (const profile of allProfiles) {
+            if (profile.email) {
+                const existingNormalized = getEmailForDuplicateCheck(profile.email);
+                if (existingNormalized === normalizedEmail) {
+                    return { error: "Questa email è già registrata. Effettua il login." }
+                }
+            }
         }
     } catch (error) {
         console.error("Error checking email:", error);
     }
 
+    // === 7. CREATE ACCOUNT IN SUPABASE ===
     const { error } = await supabase.auth.signUp({
-        email: rawData.email,
+        email: rawData.email, // Use original email for Supabase
         password: rawData.password,
         options: {
             data: {
                 username: rawData.username,
                 full_name: rawData.username,
+                // Store normalized email for future duplicate checks
+                normalized_email: normalizedEmail,
             },
         },
     })
@@ -131,14 +192,10 @@ export async function signup(prevState: AuthState | undefined, formData: FormDat
         return { error: error.message }
     }
 
-    // Se l'email confirmation è attiva, l'utente non sarà loggato subito.
-    // Supabase di default richiede conferma email.
-    // Controlliamo se siamo loggati.
-
+    // Check if email confirmation is required
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
-        // Probabilmente richiede verifica email
         return { success: true, message: "Controlla la tua email per confermare la registrazione." }
     }
 

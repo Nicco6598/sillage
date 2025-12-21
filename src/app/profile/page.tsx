@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { User, Settings, Heart, Star, Edit3, Calendar, Mail, ArrowRight, Clock, Package, Plus, Camera } from "lucide-react";
+import { User, Settings, Heart, Star, Edit3, Calendar, Mail, ArrowRight, Clock, Package, Camera } from "lucide-react";
+import { QuickAddToCollection } from "@/components/profile/quick-add-to-collection";
 import { db } from "@/lib/db";
 import { reviews, userCollection, userFavorites, fragrances, brands } from "@/lib/db-schema";
 import { eq, desc, sql, and } from "drizzle-orm";
@@ -21,7 +22,10 @@ async function getUserStats(userId: string) {
     const [collectionCount] = await db
         .select({ count: sql<number>`count(*)` })
         .from(userCollection)
-        .where(eq(userCollection.userId, userId));
+        .where(and(
+            eq(userCollection.userId, userId),
+            eq(userCollection.notes, 'owned') // Only count "Lo ho" items
+        ));
 
     return {
         reviews: Number(reviewCount?.count || 0),
@@ -267,13 +271,7 @@ export default async function ProfilePage() {
                             <div className="w-8 h-px bg-rose-gold" />
                             <h2 className="font-serif text-3xl">Il Mio Armadio</h2>
                         </div>
-                        <Link
-                            href="/explore"
-                            className="flex items-center gap-2 text-sm text-text-muted hover:text-copper transition-colors"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Aggiungi
-                        </Link>
+                        <QuickAddToCollection />
                     </div>
 
                     {collection.length > 0 ? (

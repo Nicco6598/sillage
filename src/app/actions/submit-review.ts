@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { moderateContent, getModerationMessage } from "@/lib/moderation";
+import { checkReviewRateLimit, getTimeUntilReset } from "@/lib/rate-limit";
 
 const ReviewSchema = z.object({
     fragranceId: z.string().uuid(),
@@ -28,6 +29,21 @@ export type ReviewState = {
     success?: boolean;
 }
 
+// Client-side forbidden words (basic filter before API call)
+const FORBIDDEN_WORDS = [
+    "merda", "cazzo", "minchia", "stronzo", "coglione", "puttana",
+    "troia", "fottiti", "vaffanculo", "bastardo", "negro", "frocio"
+];
+
+/**
+ * Basic client-side profanity filter
+ * This runs before the AI moderation to catch obvious violations quickly
+ */
+function containsForbiddenWords(text: string): boolean {
+    const lowerText = text.toLowerCase();
+    return FORBIDDEN_WORDS.some(word => lowerText.includes(word));
+}
+
 export async function submitReview(prevState: ReviewState, formData: FormData) {
     // Get the authenticated user
     const supabase = await createClient();
@@ -38,6 +54,22 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
             success: false,
             message: "Devi effettuare il login per lasciare una recensione."
         };
+    }
+
+    // === RATE LIMITING (1 review per 5 minutes per user) ===
+    try {
+        const rateLimitResult = await checkReviewRateLimit(user.id);
+
+        if (!rateLimitResult.success) {
+            const timeLeft = getTimeUntilReset(rateLimitResult.reset);
+            return {
+                success: false,
+                message: `Puoi inviare una recensione ogni 5 minuti. Riprova tra ${timeLeft}.`
+            };
+        }
+    } catch (error) {
+        console.error("Review rate limit check error:", error);
+        // Continue on rate limit errors (fail open for UX)
     }
 
     const username = user.user_metadata?.username || user.email?.split('@')[0] || 'Utente';
@@ -65,8 +97,17 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
         };
     }
 
-    // Moderate comment content if present
+    // === CLIENT-SIDE PROFANITY FILTER (fast check) ===
     if (validatedFields.data.comment && validatedFields.data.comment.trim().length > 0) {
+        // Quick local filter before AI moderation
+        if (containsForbiddenWords(validatedFields.data.comment)) {
+            return {
+                success: false,
+                message: "Il contenuto contiene linguaggio volgare o offensivo."
+            };
+        }
+
+        // AI Moderation with Gemini
         const moderationResult = await moderateContent(validatedFields.data.comment);
 
         if (moderationResult.flagged) {
@@ -153,6 +194,14 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
 
     // Moderate comment content if present
     if (validatedFields.data.comment && validatedFields.data.comment.trim().length > 0) {
+        // Quick local filter
+        if (containsForbiddenWords(validatedFields.data.comment)) {
+            return {
+                success: false,
+                message: "Il contenuto contiene linguaggio volgare o offensivo."
+            };
+        }
+
         const moderationResult = await moderateContent(validatedFields.data.comment);
 
         if (moderationResult.flagged) {

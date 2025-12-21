@@ -58,7 +58,10 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                     {/* LEFT COLUMN: Image & Actions */}
                     <div className="lg:col-span-5">
                         {/* Bottle Image */}
-                        <div className="aspect-[3/4] bg-bg-secondary border border-border-primary relative overflow-hidden mb-6 group rounded-sm ring-1 ring-inset ring-white/5">
+                        <div className="aspect-[3/4] bg-bg-secondary border border-border-primary relative overflow-hidden mb-6 group shadow-soft hover:shadow-elevated transition-all duration-300">
+                            {/* Depth gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none z-10" />
+
                             {fragrance.imageUrl ? (
                                 <Image
                                     src={fragrance.imageUrl}
@@ -75,7 +78,7 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                             )}
 
                             {fragrance.isNew && (
-                                <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-mono uppercase tracking-wider bg-copper text-white">
+                                <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-mono uppercase tracking-wider bg-copper text-white shadow-subtle z-20">
                                     Novità
                                 </span>
                             )}
@@ -115,8 +118,11 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                         </div>
 
                         {/* Rating Card */}
-                        <div className="p-6 bg-bg-secondary border border-border-primary mb-10">
-                            <div className="flex items-center gap-8">
+                        <div className="p-6 bg-bg-secondary border border-border-primary mb-10 shadow-soft relative overflow-hidden">
+                            {/* Inner glow effect */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
+
+                            <div className="flex items-center gap-8 relative z-10">
                                 <div>
                                     <span className="block font-serif text-5xl text-copper">
                                         {fragrance.rating.toFixed(1)}
@@ -174,27 +180,38 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                             </div>
                         )}
 
-                        {/* Notes Pyramid */}
+                        {/* Notes Pyramid - Enhanced Visual */}
                         <div className="mb-10">
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="w-8 h-px bg-rose-gold" />
                                 <h3 className="text-xs font-mono uppercase tracking-widest text-text-muted">Piramide Olfattiva</h3>
                             </div>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Top Notes */}
-                                <div className="p-5 border border-border-primary">
-                                    <h4 className="text-xs font-mono uppercase tracking-widest text-copper mb-4 pb-3 border-b border-border-primary">
-                                        Testa
-                                    </h4>
-                                    <div className="space-y-2">
+                                <div className="p-5 border border-border-primary shadow-soft relative overflow-hidden bg-bg-secondary">
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
+                                    <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border-primary relative z-10">
+                                        <div className="w-8 h-8 rounded-full bg-copper/10 border border-copper/30 flex items-center justify-center">
+                                            <span className="text-[10px] font-mono text-copper font-bold">T</span>
+                                        </div>
+                                        <h4 className="text-xs font-mono uppercase tracking-widest text-copper">
+                                            Testa
+                                        </h4>
+                                    </div>
+                                    <div className="space-y-3 relative z-10">
                                         {fragrance.notes.top.length > 0 ? (
                                             fragrance.notes.top.map(n => (
                                                 <Link
                                                     key={n.id}
                                                     href={`/explore?note=${n.name}`}
-                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors capitalize"
+                                                    className="flex items-center gap-3 group"
                                                 >
-                                                    {n.name}
+                                                    <div className="w-6 h-6 rounded-full bg-bg-tertiary border border-border-primary group-hover:border-copper group-hover:bg-copper/10 transition-all duration-300 flex items-center justify-center flex-shrink-0">
+                                                        <div className="w-2 h-2 rounded-full bg-copper/50 group-hover:bg-copper transition-colors" />
+                                                    </div>
+                                                    <span className="text-sm text-text-secondary group-hover:text-copper transition-colors capitalize">
+                                                        {n.name}
+                                                    </span>
                                                 </Link>
                                             ))
                                         ) : (
@@ -204,19 +221,30 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                                 </div>
 
                                 {/* Heart Notes */}
-                                <div className="p-5 border border-border-primary">
-                                    <h4 className="text-xs font-mono uppercase tracking-widest text-gold mb-4 pb-3 border-b border-border-primary">
-                                        Cuore
-                                    </h4>
-                                    <div className="space-y-2">
+                                <div className="p-5 border border-border-primary shadow-soft relative overflow-hidden bg-bg-secondary">
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
+                                    <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border-primary relative z-10">
+                                        <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center">
+                                            <span className="text-[10px] font-mono text-gold font-bold">C</span>
+                                        </div>
+                                        <h4 className="text-xs font-mono uppercase tracking-widest text-gold">
+                                            Cuore
+                                        </h4>
+                                    </div>
+                                    <div className="space-y-3 relative z-10">
                                         {fragrance.notes.heart.length > 0 ? (
                                             fragrance.notes.heart.map(n => (
                                                 <Link
                                                     key={n.id}
                                                     href={`/explore?note=${n.name}`}
-                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors capitalize"
+                                                    className="flex items-center gap-3 group"
                                                 >
-                                                    {n.name}
+                                                    <div className="w-6 h-6 rounded-full bg-bg-tertiary border border-border-primary group-hover:border-gold group-hover:bg-gold/10 transition-all duration-300 flex items-center justify-center flex-shrink-0">
+                                                        <div className="w-2 h-2 rounded-full bg-gold/50 group-hover:bg-gold transition-colors" />
+                                                    </div>
+                                                    <span className="text-sm text-text-secondary group-hover:text-gold transition-colors capitalize">
+                                                        {n.name}
+                                                    </span>
                                                 </Link>
                                             ))
                                         ) : (
@@ -226,19 +254,30 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                                 </div>
 
                                 {/* Base Notes */}
-                                <div className="p-5 border border-border-primary">
-                                    <h4 className="text-xs font-mono uppercase tracking-widest text-rose-gold mb-4 pb-3 border-b border-border-primary">
-                                        Fondo
-                                    </h4>
-                                    <div className="space-y-2">
+                                <div className="p-5 border border-border-primary shadow-soft relative overflow-hidden bg-bg-secondary">
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
+                                    <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border-primary relative z-10">
+                                        <div className="w-8 h-8 rounded-full bg-rose-gold/10 border border-rose-gold/30 flex items-center justify-center">
+                                            <span className="text-[10px] font-mono text-rose-gold font-bold">F</span>
+                                        </div>
+                                        <h4 className="text-xs font-mono uppercase tracking-widest text-rose-gold">
+                                            Fondo
+                                        </h4>
+                                    </div>
+                                    <div className="space-y-3 relative z-10">
                                         {fragrance.notes.base.length > 0 ? (
                                             fragrance.notes.base.map(n => (
                                                 <Link
                                                     key={n.id}
                                                     href={`/explore?note=${n.name}`}
-                                                    className="block text-sm text-text-secondary hover:text-copper transition-colors capitalize"
+                                                    className="flex items-center gap-3 group"
                                                 >
-                                                    {n.name}
+                                                    <div className="w-6 h-6 rounded-full bg-bg-tertiary border border-border-primary group-hover:border-rose-gold group-hover:bg-rose-gold/10 transition-all duration-300 flex items-center justify-center flex-shrink-0">
+                                                        <div className="w-2 h-2 rounded-full bg-rose-gold/50 group-hover:bg-rose-gold transition-colors" />
+                                                    </div>
+                                                    <span className="text-sm text-text-secondary group-hover:text-rose-gold transition-colors capitalize">
+                                                        {n.name}
+                                                    </span>
                                                 </Link>
                                             ))
                                         ) : (

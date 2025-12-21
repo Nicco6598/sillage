@@ -7,19 +7,28 @@ import { db } from "@/lib/db"
 import { profiles } from "@/lib/db-schema"
 import { eq } from "drizzle-orm"
 
+// Password must have 8+ chars, 1 uppercase, 1 number (same as register)
+const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
 const updateProfileSchema = z.object({
-    username: z.string().min(3, "L'username deve essere di almeno 3 caratteri")
+    username: z.string()
+        .min(3, "L'username deve essere di almeno 3 caratteri")
         .regex(/^[a-zA-Z0-9_]+$/, "L'username può contenere solo lettere, numeri e underscore"),
-    fullName: z.string().optional(),
 })
 
 const updatePasswordSchema = z.object({
     currentPassword: z.string().min(1, "Password attuale richiesta"),
-    newPassword: z.string().min(6, "La nuova password deve essere di almeno 6 caratteri"),
+    newPassword: z.string()
+        .min(8, "La password deve essere di almeno 8 caratteri")
+        .regex(/[A-Z]/, "La password deve contenere almeno una lettera maiuscola")
+        .regex(/\d/, "La password deve contenere almeno un numero"),
     confirmPassword: z.string().min(1, "Conferma la password"),
 }).refine((data) => data.newPassword === data.confirmPassword, {
     message: "Le password non corrispondono",
     path: ["confirmPassword"],
+}).refine((data) => data.newPassword !== data.currentPassword, {
+    message: "La nuova password deve essere diversa dalla precedente",
+    path: ["newPassword"],
 })
 
 export type SettingsState = {
@@ -27,6 +36,7 @@ export type SettingsState = {
     success?: boolean;
     message?: string;
     errors?: Record<string, string[]>;
+    requiresLogout?: boolean;
 }
 
 export async function updateProfile(prevState: SettingsState | undefined, formData: FormData): Promise<SettingsState> {
@@ -39,7 +49,6 @@ export async function updateProfile(prevState: SettingsState | undefined, formDa
 
     const rawData = {
         username: formData.get('username') as string,
-        fullName: formData.get('fullName') as string || undefined,
     }
 
     const validatedFields = updateProfileSchema.safeParse(rawData)
@@ -49,6 +58,12 @@ export async function updateProfile(prevState: SettingsState | undefined, formDa
             errors: validatedFields.error.flatten().fieldErrors,
             error: validatedFields.error.issues[0].message
         }
+    }
+
+    // Check if username is the same as current (no change needed)
+    const currentUsername = user.user_metadata?.username
+    if (currentUsername === validatedFields.data.username) {
+        return { error: "L'username è uguale a quello attuale." }
     }
 
     // Check if username is taken by another user
@@ -66,28 +81,52 @@ export async function updateProfile(prevState: SettingsState | undefined, formDa
         console.error("Error checking username:", error)
     }
 
-    // Update profile in database
+    // Update profile in database using upsert with onConflictDoUpdate
     try {
-        await db.update(profiles)
-            .set({
+        console.log("Updating profile for user:", user.id, "to username:", validatedFields.data.username);
+
+        await db
+            .insert(profiles)
+            .values({
+                id: user.id,
                 username: validatedFields.data.username,
-                fullName: validatedFields.data.fullName || null,
+                email: user.email,
                 updatedAt: new Date(),
             })
-            .where(eq(profiles.id, user.id))
+            .onConflictDoUpdate({
+                target: profiles.id,
+                set: {
+                    username: validatedFields.data.username,
+                    updatedAt: new Date(),
+                },
+            });
 
-        // Also update user metadata
-        await supabase.auth.updateUser({
+        console.log("Profile updated successfully in DB");
+
+        // Also update user metadata in Supabase Auth
+        const { error: authError } = await supabase.auth.updateUser({
             data: {
                 username: validatedFields.data.username,
-                full_name: validatedFields.data.fullName,
             }
-        })
+        });
 
-        revalidatePath('/profile')
-        revalidatePath('/settings')
+        if (authError) {
+            console.error("Error updating auth metadata:", authError);
+        } else {
+            console.log("Auth metadata updated successfully");
+        }
 
-        return { success: true, message: "Profilo aggiornato con successo!" }
+        // Sign out all sessions
+        await supabase.auth.signOut({ scope: 'global' });
+
+        revalidatePath('/profile');
+        revalidatePath('/settings');
+
+        return {
+            success: true,
+            message: "Username aggiornato! Effettua nuovamente il login.",
+            requiresLogout: true
+        };
     } catch (error) {
         console.error("Error updating profile:", error)
         return { error: "Errore durante l'aggiornamento del profilo." }
@@ -136,7 +175,14 @@ export async function updatePassword(prevState: SettingsState | undefined, formD
         return { error: "Errore durante l'aggiornamento della password." }
     }
 
-    return { success: true, message: "Password aggiornata con successo!" }
+    // Sign out all sessions after password change
+    await supabase.auth.signOut({ scope: 'global' })
+
+    return {
+        success: true,
+        message: "Password aggiornata! Effettua nuovamente il login.",
+        requiresLogout: true
+    }
 }
 
 export async function deleteAccount(): Promise<SettingsState> {

@@ -71,6 +71,24 @@ export function ExploreContent({
         });
     }, [currentFilters]);
 
+    // Debounced live search - triggers search as user types
+    useEffect(() => {
+        // Skip if the search value matches the current query (e.g., initial load)
+        if (searchValue === query) return;
+
+        const debounceTimer = setTimeout(() => {
+            const params = new URLSearchParams(searchParams);
+            if (searchValue) params.set("q", searchValue);
+            else params.delete("q");
+            params.set("page", "1");
+            startTransition(() => {
+                router.push(`/explore?${params.toString()}`);
+            });
+        }, 300);
+
+        return () => clearTimeout(debounceTimer);
+    }, [searchValue, query, searchParams, router]);
+
     const [searchInFilters, setSearchInFilters] = useState({
         brand: "",
         note: "",
@@ -310,9 +328,12 @@ export function ExploreContent({
                     />
 
                     {/* Drawer */}
-                    <div className="relative w-full max-w-md h-full bg-bg-primary border-l border-border-primary overflow-hidden shadow-2xl animate-slide-in-right">
+                    <div className="relative w-full max-w-md h-full bg-bg-primary border-l border-border-primary overflow-hidden surface-float animate-slide-in-right">
+                        {/* Subtle depth gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white/[0.02] dark:to-white/[0.01] pointer-events-none" />
+
                         {/* Header */}
-                        <div className="flex justify-between items-center p-6 border-b border-border-primary bg-bg-secondary/50">
+                        <div className="flex justify-between items-center p-6 border-b border-border-primary bg-bg-secondary/50 relative z-10">
                             <h2 className="font-serif text-2xl">Filtri</h2>
                             <button
                                 onClick={() => setIsFilterOpen(false)}
@@ -323,7 +344,7 @@ export function ExploreContent({
                         </div>
 
                         {/* Scrollable Content */}
-                        <div className="h-[calc(100%-140px)] overflow-y-auto p-6 space-y-8">
+                        <div className="h-[calc(100%-140px)] overflow-y-auto p-6 space-y-8 relative z-10">
                             {/* Gender */}
                             <div>
                                 <h3 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-4">Genere</h3>
@@ -490,8 +511,9 @@ export function ExploreContent({
                         </div>
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }
 
@@ -502,7 +524,10 @@ function FragranceCard({ fragrance }: { fragrance: Fragrance }) {
             href={`/fragrance/${fragrance.slug}`}
             className="group block"
         >
-            <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-4 group/image ring-1 ring-inset ring-white/10 rounded-sm">
+            <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-4 group/image ring-1 ring-inset ring-white/10 dark:ring-white/5 shadow-soft hover:shadow-elevated transition-all duration-300 hover:-translate-y-1">
+                {/* Subtle depth gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/8 to-transparent dark:from-white/[0.03] pointer-events-none z-10" />
+
                 {fragrance.imageUrl ? (
                     <Image
                         src={fragrance.imageUrl}
@@ -516,22 +541,22 @@ function FragranceCard({ fragrance }: { fragrance: Fragrance }) {
                 )}
 
                 {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-20" />
 
                 {/* Rating Badge */}
-                <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-bg-primary/90 backdrop-blur-sm text-xs font-mono opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-bg-primary/90 backdrop-blur-sm text-xs font-mono opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-subtle z-30">
                     <Star className="w-3 h-3 fill-gold text-gold" />
                     {fragrance.rating.toFixed(1)}
                 </div>
 
                 {/* View Arrow */}
-                <div className="absolute bottom-3 right-3 w-8 h-8 flex items-center justify-center bg-copper text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-75">
+                <div className="absolute bottom-3 right-3 w-8 h-8 flex items-center justify-center bg-copper text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-75 shadow-subtle z-30">
                     <ArrowUpRight className="w-4 h-4" />
                 </div>
 
                 {/* New Badge */}
                 {fragrance.isNew && (
-                    <div className="absolute top-3 left-3 px-2 py-1 bg-gold text-[10px] font-mono uppercase tracking-wider text-white">
+                    <div className="absolute top-3 left-3 px-2 py-1 bg-gold text-[10px] font-mono uppercase tracking-wider text-white shadow-subtle z-30">
                         New
                     </div>
                 )}

@@ -1,6 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
+import {
+    SpringIcon,
+    SummerIcon,
+    AutumnIcon,
+    WinterIcon
+} from "@/components/icons/season-icons";
 
 interface Review {
     id: string;
@@ -12,10 +18,34 @@ interface SeasonVotesProps {
 }
 
 const SEASONS = [
-    { key: "spring", label: "Primavera", icon: "🌸", color: "bg-green-500" },
-    { key: "summer", label: "Estate", icon: "☀️", color: "bg-amber-500" },
-    { key: "autumn", label: "Autunno", icon: "🍂", color: "bg-orange-900" },
-    { key: "winter", label: "Inverno", icon: "❄️", color: "bg-blue-500" },
+    {
+        key: "spring",
+        label: "Primavera",
+        Icon: SpringIcon,
+        color: "bg-emerald-500",
+        iconColor: "text-emerald-500"
+    },
+    {
+        key: "summer",
+        label: "Estate",
+        Icon: SummerIcon,
+        color: "bg-amber-500",
+        iconColor: "text-amber-500"
+    },
+    {
+        key: "autumn",
+        label: "Autunno",
+        Icon: AutumnIcon,
+        color: "bg-orange-700",
+        iconColor: "text-orange-600"
+    },
+    {
+        key: "winter",
+        label: "Inverno",
+        Icon: WinterIcon,
+        color: "bg-sky-500",
+        iconColor: "text-sky-500"
+    },
 ];
 
 export function SeasonVotes({ reviews }: SeasonVotesProps) {
@@ -51,8 +81,11 @@ export function SeasonVotes({ reviews }: SeasonVotesProps) {
     }, [seasonCounts]);
 
     return (
-        <div className="p-6 bg-bg-secondary border border-border-primary">
-            <div className="flex items-center justify-between mb-6">
+        <div className="p-6 bg-bg-secondary border border-border-primary shadow-soft relative overflow-hidden">
+            {/* Depth gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-6 relative z-10">
                 <span className="text-xs font-mono uppercase tracking-widest text-text-muted">
                     Stagioni Consigliate
                 </span>
@@ -61,8 +94,8 @@ export function SeasonVotes({ reviews }: SeasonVotesProps) {
                 </span>
             </div>
 
-            <div className="space-y-4">
-                {SEASONS.map(({ key, label, icon, color }) => {
+            <div className="space-y-4 relative z-10">
+                {SEASONS.map(({ key, label, Icon, color, iconColor }) => {
                     const count = seasonCounts[key];
                     const percentage = totalVotes > 0 ? (count / maxVotes) * 100 : 0;
 
@@ -70,7 +103,9 @@ export function SeasonVotes({ reviews }: SeasonVotesProps) {
                         <div key={key}>
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-lg">{icon}</span>
+                                    <div className={`p-1.5 rounded-full bg-bg-tertiary border border-border-primary`}>
+                                        <Icon className={`h-4 w-4 ${iconColor}`} />
+                                    </div>
                                     <span className="text-sm">{label}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -94,7 +129,7 @@ export function SeasonVotes({ reviews }: SeasonVotesProps) {
             </div>
 
             {totalVotes === 1 && reviews.filter(r => r.seasonVote).length === 0 && (
-                <p className="mt-4 text-xs text-text-muted text-center">
+                <p className="mt-4 text-xs text-text-muted text-center relative z-10">
                     Nessun voto ancora. Sii il primo a indicare le stagioni ideali!
                 </p>
             )}

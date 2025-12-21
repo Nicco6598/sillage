@@ -11,7 +11,8 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
-    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [formData, setFormData] = useState({ username: "", email: "", password: "", confirmPassword: "" });
     const [state, action, isPending] = useActionState(signup, undefined);
     const router = useRouter();
     const supabase = createClient();
@@ -33,6 +34,7 @@ export default function RegisterPage() {
     ];
 
     const allRequirementsMet = requirements.every(r => r.met);
+    const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
 
     return (
         <div className="min-h-screen flex">
@@ -145,6 +147,46 @@ export default function RegisterPage() {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Confirm Password */}
+                            <div className="group">
+                                <label className="block text-xs font-mono uppercase tracking-widest text-text-muted mb-3 group-focus-within:text-copper transition-colors">
+                                    Conferma Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        name="confirmPassword"
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        required
+                                        value={formData.confirmPassword}
+                                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                        className={cn(
+                                            "w-full bg-bg-tertiary/50 border px-4 py-3 pr-12 outline-none transition-colors",
+                                            formData.confirmPassword.length > 0 && !passwordsMatch
+                                                ? "border-red-500/50"
+                                                : passwordsMatch
+                                                    ? "border-copper"
+                                                    : "border-border-primary focus:border-copper"
+                                        )}
+                                        placeholder="••••••••"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-primary transition-colors"
+                                    >
+                                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                                {formData.confirmPassword.length > 0 && !passwordsMatch && (
+                                    <p className="text-xs text-red-500 mt-2">Le password non corrispondono</p>
+                                )}
+                                {passwordsMatch && (
+                                    <p className="text-xs text-copper mt-2 flex items-center gap-1">
+                                        <Check className="h-3 w-3" /> Le password corrispondono
+                                    </p>
+                                )}
+                            </div>
                         </div>
 
                         {state?.error && (
@@ -161,7 +203,7 @@ export default function RegisterPage() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={isPending || !allRequirementsMet}
+                            disabled={isPending || !allRequirementsMet || !passwordsMatch}
                             className="w-full bg-text-primary text-text-inverted py-4 text-sm uppercase tracking-widest font-medium hover:bg-copper disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 group"
                         >
                             {isPending ? (

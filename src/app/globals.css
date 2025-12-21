@@ -14,7 +14,7 @@
   /* Parchment #E6E2DA */
   --bg-tertiary: 218 214 205;
   /* Stone #DAD6CD */
-  --bg-elevated: 245 242 236;
+  --bg-elevated: 248 246 242;
   /* Lighter for elevated elements */
 
   /* Foreground/Text Colors - High contrast */
@@ -62,6 +62,33 @@
   --radius-full: 9999px;
 
   --transition-base: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* === DEPTH & 3D EFFECTS === */
+  /* Soft shadows - diffuse, not harsh */
+  --shadow-subtle: 0 1px 2px rgba(15, 15, 12, 0.03),
+    0 4px 8px rgba(15, 15, 12, 0.04);
+  --shadow-soft: 0 2px 4px rgba(15, 15, 12, 0.03),
+    0 8px 16px rgba(15, 15, 12, 0.05),
+    0 16px 32px rgba(15, 15, 12, 0.04);
+  --shadow-elevated: 0 4px 8px rgba(15, 15, 12, 0.04),
+    0 16px 24px rgba(15, 15, 12, 0.06),
+    0 24px 48px rgba(15, 15, 12, 0.05);
+  --shadow-float: 0 8px 16px rgba(15, 15, 12, 0.05),
+    0 24px 48px rgba(15, 15, 12, 0.08),
+    0 48px 80px rgba(15, 15, 12, 0.06);
+
+  /* Inner glow for depth - creates "lifted" effect */
+  --inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(15, 15, 12, 0.03);
+  --inner-glow-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
+  /* Ambient lighting gradients */
+  --gradient-depth: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(0, 0, 0, 0.02) 100%);
+  --gradient-surface: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0) 50%);
 }
 
 /* Dark Theme (Pure Black + Metallic Accents) */
@@ -69,20 +96,21 @@
   /* Background Colors */
   --bg-primary: 0 0 0;
   /* Pure Black - REQUESTED */
-  --bg-secondary: 10 10 10;
-  /* Almost Black */
-  --bg-tertiary: 20 20 20;
+  --bg-secondary: 12 12 12;
+  /* Almost Black - slightly brighter for depth */
+  --bg-tertiary: 22 22 22;
   /* Dark Grey */
-  --bg-elevated: 30 30 30;
+  --bg-elevated: 32 32 32;
 
-  /* Foreground/Text Colors */
+  /* Foreground/Text Colors - IMPROVED CONTRAST */
   --text-primary: 255 255 255;
   /* White text on black */
-  --text-secondary: 180 180 180;
-  /* Light Grey */
-  --text-tertiary: 120 120 120;
-  /* Grey */
-  --text-muted: 80 80 80;
+  --text-secondary: 190 190 190;
+  /* Light Grey - improved readability */
+  --text-tertiary: 145 145 145;
+  /* Grey - better contrast */
+  --text-muted: 105 105 105;
+  /* Improved from 80 - now readable on dark */
   --text-inverted: 0 0 0;
 
   /* Accent Colors */
@@ -99,12 +127,43 @@
   --color-rose-gold: 227 167 172;
   /* Pastel Rose Gold */
 
-  /* Borders */
-  --border-primary: 30 30 30;
+  /* Borders - slightly brighter for visibility */
+  --border-primary: 35 35 35;
   /* Dark Grey */
-  --border-secondary: 50 50 50;
+  --border-secondary: 55 55 55;
   /* Grey */
   --border-strong: 255 255 255;
+
+  /* === DEPTH & 3D EFFECTS (Dark Mode) === */
+  /* Soft ambient shadows with subtle glow */
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.25),
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    0 16px 32px rgba(0, 0, 0, 0.2),
+    0 0 1px rgba(255, 255, 255, 0.05);
+  --shadow-elevated: 0 4px 8px rgba(0, 0, 0, 0.3),
+    0 16px 24px rgba(0, 0, 0, 0.35),
+    0 24px 48px rgba(0, 0, 0, 0.25),
+    0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-float: 0 8px 16px rgba(0, 0, 0, 0.35),
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    0 48px 80px rgba(0, 0, 0, 0.3),
+    0 0 2px rgba(255, 255, 255, 0.1);
+
+  /* Inner glow for "lit from above" effect */
+  --inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  --inner-glow-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Ambient lighting gradients */
+  --gradient-depth: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(0, 0, 0, 0.1) 100%);
+  --gradient-surface: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0) 50%);
 }
 
 @theme inline {
@@ -172,6 +231,78 @@ body {
 
 .font-serif {
   font-family: var(--font-serif);
+}
+
+/* ============================================
+   3D DEPTH UTILITY CLASSES
+   ============================================ */
+
+/* Shadow utilities - soft, diffuse shadows */
+.shadow-subtle {
+  box-shadow: var(--shadow-subtle);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.shadow-elevated {
+  box-shadow: var(--shadow-elevated);
+}
+
+.shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
+/* Inner glow for "lifted" effect */
+.inner-glow {
+  box-shadow: var(--inner-glow);
+}
+
+.inner-glow-subtle {
+  box-shadow: var(--inner-glow-subtle);
+}
+
+/* Surface depth gradient overlay */
+.surface-depth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-depth);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Surface shine effect */
+.surface-shine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-surface);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Combined 3D card effect - premium depth */
+.card-3d {
+  position: relative;
+  box-shadow: var(--shadow-soft), var(--inner-glow-subtle);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card-3d:hover {
+  box-shadow: var(--shadow-elevated), var(--inner-glow);
+  transform: translateY(-2px);
+}
+
+/* Elevated surface - modal, dropdown */
+.surface-elevated {
+  box-shadow: var(--shadow-elevated), var(--inner-glow);
+}
+
+/* Floating element - tooltip, popover */
+.surface-float {
+  box-shadow: var(--shadow-float), var(--inner-glow);
 }
 
 /* Custom Scrollbar - Themed */

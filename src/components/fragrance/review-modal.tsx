@@ -6,6 +6,7 @@ import { submitReview, updateReview } from "@/app/actions/submit-review";
 import { Star, X, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
+import { SpringIcon, SummerIcon, AutumnIcon, WinterIcon } from "@/components/icons/season-icons";
 
 interface EditingReview {
     id: string;
@@ -320,10 +321,10 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                         <input type="hidden" name="seasonVote" value={selectedSeasons.join(",")} />
                                         <div className="grid grid-cols-4 gap-2">
                                             {[
-                                                { value: "spring", label: "Prim", icon: "🌸" },
-                                                { value: "summer", label: "Est", icon: "☀️" },
-                                                { value: "autumn", label: "Aut", icon: "🍂" },
-                                                { value: "winter", label: "Inv", icon: "❄️" },
+                                                { value: "spring", label: "Prim", Icon: SpringIcon, color: "text-emerald-500" },
+                                                { value: "summer", label: "Est", Icon: SummerIcon, color: "text-amber-500" },
+                                                { value: "autumn", label: "Aut", Icon: AutumnIcon, color: "text-orange-600" },
+                                                { value: "winter", label: "Inv", Icon: WinterIcon, color: "text-sky-500" },
                                             ].map((s) => (
                                                 <button
                                                     key={s.value}
@@ -336,13 +337,13 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                                         }
                                                     }}
                                                     className={cn(
-                                                        "flex flex-col items-center gap-1 p-2 border transition-all",
+                                                        "flex flex-col items-center gap-1.5 p-2.5 border transition-all",
                                                         selectedSeasons.includes(s.value)
                                                             ? "border-copper bg-copper/10"
                                                             : "border-border-primary opacity-60 hover:opacity-100"
                                                     )}
                                                 >
-                                                    <span className="text-lg md:text-xl">{s.icon}</span>
+                                                    <s.Icon className={cn("h-5 w-5 md:h-6 md:w-6", selectedSeasons.includes(s.value) ? "text-copper" : s.color)} />
                                                     <span className="text-[9px] font-mono uppercase block">{s.label}</span>
                                                 </button>
                                             ))}
@@ -457,10 +458,10 @@ function RadioOption({ name, value, label }: { name: string, value: string, labe
 function SeasonSelector({ name }: { name: string }) {
     const [selected, setSelected] = useState<string[]>([]);
     const seasons = [
-        { value: "spring", label: "Primavera", icon: "🌸" },
-        { value: "summer", label: "Estate", icon: "☀️" },
-        { value: "autumn", label: "Autunno", icon: "🍂" },
-        { value: "winter", label: "Inverno", icon: "❄️" },
+        { value: "spring", label: "Primavera", Icon: SpringIcon, color: "text-emerald-500" },
+        { value: "summer", label: "Estate", Icon: SummerIcon, color: "text-amber-500" },
+        { value: "autumn", label: "Autunno", Icon: AutumnIcon, color: "text-orange-600" },
+        { value: "winter", label: "Inverno", Icon: WinterIcon, color: "text-sky-500" },
     ];
 
     const toggleSeason = (val: string) => {
@@ -486,7 +487,7 @@ function SeasonSelector({ name }: { name: string }) {
                             : "border-border-primary opacity-60 hover:opacity-100"
                     )}
                 >
-                    <span className="text-2xl sm:text-3xl">{s.icon}</span>
+                    <s.Icon className={cn("h-6 w-6 sm:h-8 sm:w-8", selected.includes(s.value) ? "text-text-primary" : s.color)} />
                     <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-center hidden sm:block truncate w-full">{s.label}</span>
 
                     {selected.includes(s.value) && (

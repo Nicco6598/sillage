@@ -378,7 +378,7 @@ function DesktopUserDropdown({ user, username }: { user: any; username: string }
                         className="fixed inset-0 z-40"
                         onClick={() => setIsOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-bg-primary border border-border-primary shadow-xl z-50 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-56 bg-bg-primary border border-border-primary surface-elevated z-50 overflow-hidden">
                         <div className="p-3 border-b border-border-primary bg-bg-secondary/30">
                             <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1">Account</p>
                             <p className="text-sm truncate">{user.email}</p>
