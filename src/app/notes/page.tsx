@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { getUniqueNotes, getDatabaseStats } from "@/lib/fragrance-db";
 
 // Olfactory families with icons represented as emojis for simplicity
@@ -56,7 +56,7 @@ export default async function NotesPage() {
                                     Note<span className="text-copper">.</span>
                                 </h1>
                                 <p className="max-w-lg text-lg text-text-secondary leading-relaxed">
-                                    L'alfabeto invisibile delle fragranze. Ogni nota racconta una storia.
+                                    L&apos;alfabeto invisibile delle fragranze. Ogni nota racconta una storia.
                                 </p>
                             </div>
                         </div>

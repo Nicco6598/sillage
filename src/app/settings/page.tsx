@@ -81,6 +81,7 @@ export default function SettingsPage() {
     // Handle logout redirect after successful update
     useEffect(() => {
         if (profileState?.requiresLogout || passwordState?.requiresLogout) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsLoggingOut(true);
             // Wait a bit then redirect to login
             const timer = setTimeout(() => {

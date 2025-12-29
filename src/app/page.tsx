@@ -36,7 +36,7 @@ export default async function Home() {
 
           <p className="max-w-xl text-lg md:text-xl text-text-secondary leading-relaxed mb-12">
             Esplora, recensisci e colleziona oltre {stats.fragrances.toLocaleString()} fragranze
-            in un'esperienza curata per veri appassionati.
+            in un&apos;esperienza curata per veri appassionati.
           </p>
 
           {/* CTAs */}

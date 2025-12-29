@@ -154,7 +154,7 @@ export function ReviewCard({ review, currentUserId, fragranceSlug, onEdit }: Rev
             {/* Comment */}
             {review.comment && (
                 <p className="text-text-secondary leading-relaxed mb-6">
-                    "{review.comment}"
+                    &quot;{review.comment}&quot;
                 </p>
             )}
 

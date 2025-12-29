@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, ArrowUpRight, Users, Star, TrendingUp } from "lucide-react";
+import { MessageCircle, ArrowUpRight, Users } from "lucide-react";
 
 const stats = [
     { label: "Membri", value: "50k+", color: "text-copper" },

@@ -20,116 +20,82 @@ const genderGradients = {
     unisex: "from-violet-500/10 to-purple-500/10",
 };
 
-const genderColors = {
-    masculine: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-    feminine: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
-    unisex: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-};
-
 /**
- * Standard fragrance card with full details
+ * Premium Fragrance Card - Stone & Silk Design System
+ * Used across Explore, Home, and Brand pages for a consistent aesthetic.
  */
-export function FragranceCard({ fragrance }: FragranceCardProps) {
-    const [isLiked, setIsLiked] = useState(false);
-    const [imageError, setImageError] = useState(false);
-
-    const hasValidImage = fragrance.imageUrl &&
-        !imageError;
-
+export function FragranceCard({
+    fragrance,
+    variant = "default"
+}: {
+    fragrance: Fragrance;
+    variant?: "default" | "centered";
+}) {
     return (
         <Link
             href={`/fragrance/${fragrance.slug}`}
-            className={cn(
-                "group block overflow-hidden rounded-xl border border-border-primary bg-bg-secondary",
-                "transition-all duration-200 hover:border-accent/30 hover:shadow-md"
-            )}
+            className="group block"
         >
-            {/* Image */}
-            <div className="relative aspect-square overflow-hidden bg-bg-tertiary">
-                {/* Gradient Background */}
-                <div
-                    className={cn(
-                        "absolute inset-0 bg-gradient-to-br",
-                        genderGradients[fragrance.gender]
-                    )}
-                />
+            <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-4 group/image ring-1 ring-inset ring-white/10 dark:ring-white/5 shadow-soft hover:shadow-elevated transition-all duration-500 hover:-translate-y-1">
+                {/* Visual Depth Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent dark:from-white/[0.03] pointer-events-none z-10" />
 
-                {/* Real Image or Placeholder */}
-                {hasValidImage ? (
+                {fragrance.imageUrl ? (
                     <Image
                         src={fragrance.imageUrl}
-                        alt={`${fragrance.name} by ${fragrance.brand.name}`}
+                        alt={fragrance.name}
                         fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={() => setImageError(true)}
+                        className="object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-5xl opacity-60">🌸</span>
+                    <div className="absolute inset-0 bg-gradient-to-br from-bg-secondary to-bg-tertiary flex items-center justify-center">
+                        <span className="text-4xl opacity-20">🌸</span>
                     </div>
                 )}
 
-                {/* Badges */}
-                {fragrance.isNew && (
-                    <span className="absolute left-2 top-2 rounded-md bg-accent px-2 py-0.5 text-xs font-medium text-white">
-                        New
-                    </span>
-                )}
+                {/* Hover Tint */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.02] transition-colors duration-500 z-20" />
 
-                {/* Like Button */}
-                <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        setIsLiked(!isLiked);
-                    }}
-                    className={cn(
-                        "absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full transition-all",
-                        isLiked
-                            ? "bg-error/10 text-error"
-                            : "bg-black/20 text-white backdrop-blur-sm hover:bg-error/20 hover:text-error"
-                    )}
-                >
-                    <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
-                </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-accent">
-                    {fragrance.brand.name}
-                </p>
-                <h3 className="mt-1 font-medium text-text-primary line-clamp-1 group-hover:text-accent">
-                    {fragrance.name}
-                </h3>
-                <p className="mt-1 text-xs text-text-muted">
-                    {fragrance.concentration} {fragrance.year && `• ${fragrance.year}`}
-                </p>
-
-                {/* Rating */}
-                <div className="mt-3 flex items-center gap-1.5">
-                    <Star className="h-4 w-4 fill-warning text-warning" />
-                    <span className="text-sm font-medium text-text-primary">
-                        {formatRating(fragrance.rating)}
-                    </span>
-                    <span className="text-xs text-text-muted">
-                        ({fragrance.reviewCount.toLocaleString()})
-                    </span>
+                {/* Info Badges */}
+                <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 bg-bg-primary/90 backdrop-blur-md text-[10px] font-mono opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-subtle z-30">
+                    <Star className="w-3 h-3 fill-gold text-gold" />
+                    {fragrance.rating.toFixed(1)}
                 </div>
 
-                {/* Accords */}
-                {fragrance.accords.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1">
-                        {fragrance.accords.slice(0, 2).map((accord) => (
-                            <span
-                                key={accord.name}
-                                className="rounded-full bg-bg-tertiary px-2 py-0.5 text-xs text-text-secondary"
-                            >
-                                {accord.name}
-                            </span>
-                        ))}
+                {/* New Indicator */}
+                {fragrance.isNew && (
+                    <div className="absolute top-3 left-3 px-2 py-0.5 bg-gold text-[9px] font-mono uppercase tracking-widest text-white shadow-subtle z-30">
+                        New
                     </div>
                 )}
+            </div>
+
+            {/* Typography Section */}
+            <div className={cn(
+                "space-y-1 transition-colors duration-300",
+                variant === "centered" ? "text-center" : "text-left"
+            )}>
+                <h3 className="font-medium text-text-primary leading-tight line-clamp-1 group-hover:text-copper transition-colors duration-300">
+                    {fragrance.name}
+                </h3>
+                <div className="flex flex-col gap-0.5">
+                    <p className="text-[11px] text-text-muted uppercase tracking-[0.15em] font-medium truncate">
+                        {fragrance.brand.name}
+                    </p>
+                    <div className={cn(
+                        "flex items-center gap-2 pt-1 opacity-70",
+                        variant === "centered" ? "justify-center" : "justify-start"
+                    )}>
+                        <span className="text-[10px] text-text-tertiary font-mono">{fragrance.concentration}</span>
+                        {fragrance.year && (
+                            <>
+                                <span className="text-text-muted/30">|</span>
+                                <span className="text-[10px] text-text-tertiary font-mono">{fragrance.year}</span>
+                            </>
+                        )}
+                    </div>
+                </div>
             </div>
         </Link>
     );

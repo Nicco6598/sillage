@@ -24,6 +24,12 @@ interface DynamicPerformanceProps {
 type TimeFilter = "all" | "recent" | "2024" | "2023" | "older";
 type BatchFilter = string | null;
 
+const TrendIcon = ({ value }: { value: number }) => {
+    if (Math.abs(value) < 0.1) return <Minus className="h-3 w-3 text-text-muted" />;
+    if (value > 0) return <TrendingUp className="h-3 w-3 text-green-500" />;
+    return <TrendingDown className="h-3 w-3 text-red-500" />;
+};
+
 export function DynamicPerformance({
     reviews,
     defaultSillage,
@@ -136,12 +142,6 @@ export function DynamicPerformance({
             rating: stats.rating - allAvgRating,
         };
     }, [reviews, stats, timeFilter, batchFilter, defaultSillage, defaultLongevity, defaultPriceValue]);
-
-    const TrendIcon = ({ value }: { value: number }) => {
-        if (Math.abs(value) < 0.1) return <Minus className="h-3 w-3 text-text-muted" />;
-        if (value > 0) return <TrendingUp className="h-3 w-3 text-green-500" />;
-        return <TrendingDown className="h-3 w-3 text-red-500" />;
-    };
 
     const hasActiveFilter = timeFilter !== "all" || batchFilter !== null;
 

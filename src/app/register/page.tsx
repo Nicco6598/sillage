@@ -42,8 +42,8 @@ export default function RegisterPage() {
             <div className="hidden lg:flex flex-1 bg-bg-secondary border-r border-border-primary items-center justify-center">
                 <div className="text-center px-12">
                     <p className="font-serif text-3xl xl:text-4xl leading-relaxed text-text-secondary max-w-md">
-                        "Un profumo è come un <br />
-                        <span className="text-gold italic">vestito invisibile</span>."
+                        &quot;Un profumo è come un <br />
+                        <span className="text-gold italic">vestito invisibile</span>.&quot;
                     </p>
                     <p className="mt-6 text-xs font-mono uppercase tracking-widest text-text-muted">
                         — Coco Chanel

@@ -240,7 +240,7 @@ export function BrandsClientPage({ allBrands, featuredBrands, stats }: BrandsCli
                 ) : (
                     <div className="py-24 text-center">
                         <p className="text-lg text-text-muted">
-                            Nessun brand trovato per "{searchQuery}"
+                            Nessun brand trovato per &quot;{searchQuery}&quot;
                         </p>
                         <button
                             onClick={() => setSearchQuery("")}

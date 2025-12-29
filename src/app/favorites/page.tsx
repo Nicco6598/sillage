@@ -22,7 +22,7 @@ export default function FavoritesPage() {
                 <h1 className="font-serif text-4xl mb-4">Salva i tuoi preferiti.</h1>
                 <p className="text-text-secondary mb-8">Accedi per creare la tua wishlist personale.</p>
                 <Link href="/login" className="border-b border-text-primary pb-1 uppercase tracking-widest text-sm hover:text-text-primary/70 transition-colors">
-                    Accedi all'account
+                    Accedi all&apos;account
                 </Link>
             </div>
         )

@@ -212,7 +212,8 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
         }
     }
 
-    const { slug: _, ...rawDataForDb } = validatedFields.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { slug: _slug, ...rawDataForDb } = validatedFields.data;
 
     const dbData = {
         ...rawDataForDb,

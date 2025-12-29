@@ -106,7 +106,7 @@ export default function TermsPage() {
                                 Termini<span className="text-copper">.</span>
                             </h1>
                             <p className="max-w-lg text-lg text-text-secondary leading-relaxed">
-                                Termini e condizioni d'uso della piattaforma Sillage.
+                                Termini e condizioni d&apos;uso della piattaforma Sillage.
                             </p>
                         </div>
 

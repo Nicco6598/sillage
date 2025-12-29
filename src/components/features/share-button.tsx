@@ -23,7 +23,7 @@ export function ShareButton({ name, brand }: ShareButtonProps) {
                     url: url,
                 });
                 return;
-            } catch (err) {
+            } catch (_err) {
                 // Ignore abort errors
             }
         }

@@ -7,8 +7,6 @@ import { db } from "@/lib/db"
 import { profiles } from "@/lib/db-schema"
 import { eq } from "drizzle-orm"
 
-// Password must have 8+ chars, 1 uppercase, 1 number (same as register)
-const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 const updateProfileSchema = z.object({
     username: z.string()

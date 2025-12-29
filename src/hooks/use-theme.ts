@@ -44,6 +44,7 @@ export function useTheme() {
     useEffect(() => {
         const stored = localStorage.getItem("sillage-theme") as Theme | null;
         const initialTheme = stored || "system";
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setThemeState(initialTheme);
         applyTheme(resolveTheme(initialTheme));
         setMounted(true);

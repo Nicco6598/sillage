@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { Search, ArrowUpRight, Crown, Gem, Star, Sparkles } from "lucide-react";
 import { getAllBrandsWithCount, getFeaturedBrands, getDatabaseStats } from "@/lib/fragrance-db";
 import { BrandsClientPage } from "./brands-client";
 

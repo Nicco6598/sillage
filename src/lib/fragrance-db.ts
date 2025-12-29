@@ -1,16 +1,52 @@
 
 import { db } from "./db";
-import { fragrances, brands, fragranceNotes, fragranceAccords, notes, reviews } from "./db-schema";
-import { eq, ilike, and, desc, inArray, count } from "drizzle-orm";
+import { fragrances, brands, fragranceNotes, fragranceAccords, notes, reviews, fragranceSimilarities, fragranceSimilarityVotes } from "./db-schema";
+import { eq, ilike, and, desc, inArray, count, sql } from "drizzle-orm";
 import type { Fragrance, Brand } from "@/types/fragrance";
 
 /**
  * Helper to transform DB result to Fragrance type
  */
-function transformToFragrance(curr: any): Fragrance {
-    const topNotes = curr.notes.filter((n: any) => n.type === 'top' && n.note).map((n: any) => ({ id: n.note!.id, name: n.note!.name, type: 'top' as const }));
-    const heartNotes = curr.notes.filter((n: any) => n.type === 'heart' && n.note).map((n: any) => ({ id: n.note!.id, name: n.note!.name, type: 'heart' as const }));
-    const baseNotes = curr.notes.filter((n: any) => n.type === 'base' && n.note).map((n: any) => ({ id: n.note!.id, name: n.note!.name, type: 'base' as const }));
+interface DbFragrance {
+    id: string;
+    name: string;
+    slug: string;
+    brand: {
+        id: string;
+        name: string;
+        slug: string;
+        country: string | null;
+    } | null;
+    imageUrl: string | null;
+    rating: string | number | null;
+    reviewCount: number | null;
+    releaseYear: number | null;
+    gender: string | null;
+    concentration: string | null;
+    notes: Array<{
+        type: string | null;
+        note: {
+            id: string;
+            name: string;
+        } | null;
+    }>;
+    accords: Array<{
+        name: string;
+        percentage: number | null;
+        color: string | null;
+    }>;
+    sillageRating: string | number | null;
+    longevityRating: string | number | null;
+    priceValueRating: string | number | null;
+}
+
+/**
+ * Helper to transform DB result to Fragrance type
+ */
+function transformToFragrance(curr: DbFragrance): Fragrance {
+    const topNotes = curr.notes.filter((n) => n.type === 'top' && n.note).map((n) => ({ id: n.note!.id, name: n.note!.name, type: 'top' as const }));
+    const heartNotes = curr.notes.filter((n) => n.type === 'heart' && n.note).map((n) => ({ id: n.note!.id, name: n.note!.name, type: 'heart' as const }));
+    const baseNotes = curr.notes.filter((n) => n.type === 'base' && n.note).map((n) => ({ id: n.note!.id, name: n.note!.name, type: 'base' as const }));
 
     // Ensure brand exists (it should due to foreign key, but TS doesn't know)
     const brand = curr.brand || { id: "unknown", name: "Unknown", slug: "unknown", country: null };
@@ -30,17 +66,17 @@ function transformToFragrance(curr: any): Fragrance {
         reviewCount: curr.reviewCount || 0,
         year: curr.releaseYear || undefined,
         gender: (curr.gender as "masculine" | "feminine" | "unisex") || "unisex",
-        concentration: curr.concentration || "EDP",
+        concentration: (curr.concentration as "EDT" | "EDP" | "Parfum" | "EDC" | "Cologne") || "EDP",
         notes: {
             top: topNotes,
             heart: heartNotes,
             base: baseNotes,
         },
-        accords: curr.accords.map((a: any) => ({
+        accords: curr.accords.map((a) => ({
             name: a.name,
             percentage: a.percentage || 0,
             color: a.color || "#cccccc"
-        })).sort((a: any, b: any) => b.percentage - a.percentage),
+        })).sort((a, b) => (b.percentage || 0) - (a.percentage || 0)),
         sillage: Math.min(5, Math.max(1, Math.round(Number(curr.sillageRating || 3)))) as 1 | 2 | 3 | 4 | 5,
         longevity: Math.min(5, Math.max(1, Math.round(Number(curr.longevityRating || 3)))) as 1 | 2 | 3 | 4 | 5,
         priceValue: Math.min(5, Math.max(1, Math.round(Number(curr.priceValueRating || 3)))) as 1 | 2 | 3 | 4 | 5,
@@ -70,7 +106,7 @@ export async function getFragranceBySlug(slug: string): Promise<Fragrance | null
 
     if (!result) return null;
 
-    return transformToFragrance(result);
+    return transformToFragrance(result as DbFragrance);
 }
 
 /**
@@ -91,7 +127,7 @@ export async function getFeaturedFragrances(limit = 8): Promise<Fragrance[]> {
         }
     });
 
-    return results.map(transformToFragrance);
+    return results.map((r) => transformToFragrance(r as DbFragrance));
 }
 
 
@@ -179,7 +215,7 @@ export async function searchFragrances(options: {
     // Count total (optional, separate query)
 
     return {
-        fragrances: results.map(transformToFragrance),
+        fragrances: results.map((r) => transformToFragrance(r as DbFragrance)),
         total: results.length, // approximation
         source: 'database'
     };
@@ -243,7 +279,7 @@ export async function getFragrancesByBrand(brandSlug: string, limit = 20) {
         }
     });
 
-    return results.map(transformToFragrance);
+    return results.map((r) => transformToFragrance(r as DbFragrance));
 }
 
 /**
@@ -273,8 +309,9 @@ export async function getSimilarFragrances(fragrance: Fragrance, limit = 4): Pro
         });
 
         const mapped = similarByAccord
-            .map(a => transformToFragrance(a.fragrance))
-            .filter(f => f.id !== fragrance.id)
+            .filter((a) => a.fragrance)
+            .map((a) => transformToFragrance(a.fragrance as DbFragrance))
+            .filter((f) => f.id !== fragrance.id)
             .slice(0, limit);
 
         if (mapped.length > 0) return mapped;
@@ -295,8 +332,8 @@ export async function getSimilarFragrances(fragrance: Fragrance, limit = 4): Pro
     });
 
     return results
-        .map(transformToFragrance)
-        .filter(f => f.id !== fragrance.id)
+        .map((r) => transformToFragrance(r as DbFragrance))
+        .filter((f) => f.id !== fragrance.id)
         .slice(0, limit);
 }
 
@@ -397,3 +434,115 @@ export async function getFeaturedBrands(limit = 4): Promise<{
         .slice(0, limit);
 }
 
+/**
+ * Get manual similarities for a fragrance, sorted by score
+ */
+export async function getManualSimilarities(fragranceId: string, limit = 50) {
+    const results = await db.select({
+        id: fragranceSimilarities.id,
+        similarFragrance: fragrances,
+        brand: brands,
+        votesScore: sql<number>`COALESCE(SUM(${fragranceSimilarityVotes.vote}), 0)`.mapWith(Number),
+        upvotes: sql<number>`COUNT(CASE WHEN ${fragranceSimilarityVotes.vote} = 1 THEN 1 END)`.mapWith(Number),
+        downvotes: sql<number>`COUNT(CASE WHEN ${fragranceSimilarityVotes.vote} = -1 THEN 1 END)`.mapWith(Number),
+    })
+        .from(fragranceSimilarities)
+        .innerJoin(fragrances, eq(fragranceSimilarities.similarId, fragrances.id))
+        .innerJoin(brands, eq(fragrances.brandId, brands.id))
+        .leftJoin(fragranceSimilarityVotes, eq(fragranceSimilarities.id, fragranceSimilarityVotes.similarityId))
+        .where(eq(fragranceSimilarities.fragranceId, fragranceId))
+        .groupBy(fragranceSimilarities.id, fragrances.id, brands.id)
+        .orderBy(desc(sql`COALESCE(SUM(${fragranceSimilarityVotes.vote}), 0)`))
+        .limit(limit);
+
+    return results.map(r => ({
+        similarityId: r.id,
+        fragrance: transformToFragrance({ ...r.similarFragrance, brand: r.brand, notes: [], accords: [] } as DbFragrance),
+        score: r.votesScore,
+        upvotes: r.upvotes,
+        downvotes: r.downvotes,
+    }));
+}
+
+/**
+ * Vote for a similarity
+ */
+export async function voteSimilarity(similarityId: string, userId: string | null, vote: 1 | -1) {
+    if (!userId) return null;
+
+    return await db.insert(fragranceSimilarityVotes)
+        .values({
+            similarityId,
+            userId,
+            vote,
+        })
+        .onConflictDoUpdate({
+            target: [fragranceSimilarityVotes.similarityId, fragranceSimilarityVotes.userId],
+            set: { vote },
+        });
+}
+
+/**
+ * Delete a similarity vote (toggle off)
+ */
+export async function deleteSimilarityVote(similarityId: string, userId: string | null) {
+    if (!userId) return null;
+
+    return await db.delete(fragranceSimilarityVotes)
+        .where(and(
+            eq(fragranceSimilarityVotes.similarityId, similarityId),
+            eq(fragranceSimilarityVotes.userId, userId)
+        ));
+}
+
+/**
+ * Get user votes for a fragrance's similarities
+ */
+export async function getUserSimilarityVotes(fragranceId: string, userId: string): Promise<Record<string, number>> {
+    const results = await db.select({
+        similarityId: fragranceSimilarityVotes.similarityId,
+        vote: fragranceSimilarityVotes.vote,
+    })
+        .from(fragranceSimilarityVotes)
+        .innerJoin(fragranceSimilarities, eq(fragranceSimilarityVotes.similarityId, fragranceSimilarities.id))
+        .where(and(
+            eq(fragranceSimilarities.fragranceId, fragranceId),
+            eq(fragranceSimilarityVotes.userId, userId)
+        ));
+
+    return results.reduce((acc, curr) => {
+        if (curr.similarityId) {
+            acc[curr.similarityId] = curr.vote;
+        }
+        return acc;
+    }, {} as Record<string, number>);
+}
+
+/**
+ * Get a specific vote for a user on a similarity
+ */
+export async function getSpecificSimilarityVote(similarityId: string, userId: string) {
+    const result = await db.select({ vote: fragranceSimilarityVotes.vote })
+        .from(fragranceSimilarityVotes)
+        .where(and(
+            eq(fragranceSimilarityVotes.similarityId, similarityId),
+            eq(fragranceSimilarityVotes.userId, userId)
+        ))
+        .limit(1);
+
+    return result[0]?.vote || null;
+}
+
+/**
+ * Add a new similarity suggestion
+ */
+export async function addSimilaritySuggestion(fragranceId: string, similarId: string) {
+    if (fragranceId === similarId) return null;
+
+    return await db.insert(fragranceSimilarities)
+        .values({
+            fragranceId,
+            similarId,
+        })
+        .onConflictDoNothing();
+}

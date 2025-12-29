@@ -47,6 +47,8 @@ export const fragrancesRelations = relations(fragrances, ({ one, many }) => ({
     notes: many(fragranceNotes),
     accords: many(fragranceAccords),
     reviews: many(reviews),
+    similarTo: many(fragranceSimilarities, { relationName: 'fragrance_similarities_source' }),
+    remindedBy: many(fragranceSimilarities, { relationName: 'fragrance_similarities_target' }),
 }));
 
 // --- NOTES ---
@@ -179,6 +181,49 @@ export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
 // const authUsers = pgTable('users', { id: uuid('id').primaryKey() }, { schema: 'auth' });
 // But let's keep it simple for now as we don't query auth.users from here usually.
 const authUsers = pgTable('users', { id: uuid('id').primaryKey() });
+
+// --- FRAGRANCE SIMILARITIES ---
+export const fragranceSimilarities = pgTable('fragrance_similarities', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    fragranceId: uuid('fragrance_id').references(() => fragrances.id, { onDelete: 'cascade' }),
+    similarId: uuid('similar_id').references(() => fragrances.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+    uniqueSimilarity: unique().on(table.fragranceId, table.similarId),
+    fragIdx: index('idx_fragrance_similarities_fragrance_id').on(table.fragranceId),
+}));
+
+export const fragranceSimilaritiesRelations = relations(fragranceSimilarities, ({ one, many }) => ({
+    fragrance: one(fragrances, {
+        fields: [fragranceSimilarities.fragranceId],
+        references: [fragrances.id],
+        relationName: 'fragrance_similarities_source',
+    }),
+    similarFragrance: one(fragrances, {
+        fields: [fragranceSimilarities.similarId],
+        references: [fragrances.id],
+        relationName: 'fragrance_similarities_target',
+    }),
+    votes: many(fragranceSimilarityVotes),
+}));
+
+export const fragranceSimilarityVotes = pgTable('fragrance_similarity_votes', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    similarityId: uuid('similarity_id').references(() => fragranceSimilarities.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id'), // References auth.users
+    vote: integer('vote').notNull(), // 1 for upvote, -1 for downvote
+    createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+    uniqueUserVote: unique().on(table.similarityId, table.userId),
+    simIdx: index('idx_fragrance_similarity_votes_similarity_id').on(table.similarityId),
+}));
+
+export const fragranceSimilarityVotesRelations = relations(fragranceSimilarityVotes, ({ one }) => ({
+    similarity: one(fragranceSimilarities, {
+        fields: [fragranceSimilarityVotes.similarityId],
+        references: [fragranceSimilarities.id],
+    }),
+}));
 
 
 

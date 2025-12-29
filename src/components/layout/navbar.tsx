@@ -3,7 +3,16 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { surpriseMe } from "@/app/actions/discovery";
-import { Search, Heart, Menu, X, Sparkles, ArrowUpRight, ArrowRight, User, LogOut, Settings } from "lucide-react";
+import { Search, Heart, Menu, X, Sparkles, ArrowUpRight, ArrowRight, User as UserIcon, LogOut, Settings } from "lucide-react";
+
+interface User {
+    id: string;
+    email?: string;
+    user_metadata: {
+        username?: string;
+        full_name?: string;
+    };
+}
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
@@ -34,7 +43,7 @@ export function Navbar() {
     const [mobileSearchQuery, setMobileSearchQuery] = useState("");
 
     // Auth state
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [username, setUsername] = useState<string>("");
     const supabase = createClient();
 
@@ -226,7 +235,7 @@ export function Navbar() {
                                     className="group flex items-center gap-5 hover:opacity-80 transition-opacity"
                                 >
                                     <div className="w-16 h-16 border border-copper bg-copper/10 flex items-center justify-center text-copper">
-                                        <User className="h-7 w-7" />
+                                        <UserIcon className="h-7 w-7" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-serif text-3xl group-hover:text-copper transition-colors">{username}</p>
@@ -357,7 +366,7 @@ export function Navbar() {
     );
 }
 
-function DesktopUserDropdown({ user, username }: { user: any; username: string }) {
+function DesktopUserDropdown({ user, username }: { user: User; username: string }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -367,7 +376,7 @@ function DesktopUserDropdown({ user, username }: { user: any; username: string }
                 className="flex items-center gap-2 px-3 py-2 border border-transparent hover:bg-bg-tertiary transition-colors"
             >
                 <div className="w-8 h-8 border border-copper/30 bg-copper/5 flex items-center justify-center text-copper">
-                    <User className="h-4 w-4" />
+                    <UserIcon className="h-4 w-4" />
                 </div>
                 <span className="text-sm hidden md:block">{username}</span>
             </button>
@@ -390,7 +399,7 @@ function DesktopUserDropdown({ user, username }: { user: any; username: string }
                                 className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-bg-tertiary transition-colors"
                                 onClick={() => setIsOpen(false)}
                             >
-                                <User className="h-4 w-4 text-text-secondary" />
+                                <UserIcon className="h-4 w-4 text-text-secondary" />
                                 Profilo
                             </Link>
                             <Link

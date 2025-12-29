@@ -10,7 +10,6 @@ import { db } from "@/lib/db";
 import { profiles } from "@/lib/db-schema";
 import { eq } from "drizzle-orm";
 import {
-    normalizeEmail,
     validateEmail,
     getEmailForDuplicateCheck
 } from "@/lib/email-validation";
@@ -71,11 +70,9 @@ export async function login(prevState: AuthState | undefined, formData: FormData
                 return { error: "Utente non trovato" }
             }
 
-            // @ts-ignore
             if (!userProfile[0].email) {
                 return { error: "Impossibile recuperare l'email per questo username." }
             }
-            // @ts-ignore
             emailToSignIn = userProfile[0].email;
 
         } catch (e) {

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowUpRight, Star } from "lucide-react";
 import { getBrandBySlug, getFragrancesByBrand } from "@/lib/fragrance-db";
+import { FragranceCard } from "@/components/fragrance/fragrance-card";
 import type { Fragrance } from "@/types/fragrance";
 
 interface BrandPageProps {
@@ -57,7 +58,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
                                 {brand.description && (
                                     <div className="relative border-l-2 border-copper pl-6 py-2">
                                         <p className="text-lg md:text-xl text-text-secondary leading-relaxed font-serif italic opacity-90">
-                                            "{brand.description}"
+                                            &quot;{brand.description}&quot;
                                         </p>
                                     </div>
                                 )}
@@ -83,7 +84,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
                     {fragrances.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
                             {fragrances.map((fragrance) => (
-                                <BrandFragranceCard key={fragrance.id} fragrance={fragrance} />
+                                <FragranceCard key={fragrance.id} fragrance={fragrance} variant="centered" />
                             ))}
                         </div>
                     ) : (
@@ -98,58 +99,4 @@ export default async function BrandPage({ params }: BrandPageProps) {
     );
 }
 
-// Fragrance Card Component (Matching Explore Page Style)
-function BrandFragranceCard({ fragrance }: { fragrance: Fragrance }) {
-    return (
-        <Link
-            href={`/fragrance/${fragrance.slug}`}
-            className="group block"
-        >
-            <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-5 group/image ring-1 ring-inset ring-white/10 rounded-sm">
-                {fragrance.imageUrl ? (
-                    <Image
-                        src={fragrance.imageUrl}
-                        alt={fragrance.name}
-                        fill
-                        className="object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-bg-secondary to-bg-tertiary" />
-                )}
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
-
-                {/* Rating Badge */}
-                <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-bg-primary/90 backdrop-blur-sm text-xs font-mono opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                    <Star className="w-3 h-3 fill-gold text-gold" />
-                    {fragrance.rating.toFixed(1)}
-                </div>
-
-                {/* View Arrow */}
-                <div className="absolute bottom-3 right-3 w-8 h-8 flex items-center justify-center bg-copper text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-75">
-                    <ArrowUpRight className="w-4 h-4" />
-                </div>
-
-                {/* New Badge */}
-                {fragrance.isNew && (
-                    <div className="absolute top-3 left-3 px-2 py-1 bg-gold text-[10px] font-mono uppercase tracking-wider text-white">
-                        New
-                    </div>
-                )}
-            </div>
-
-            {/* Info */}
-            <div className="space-y-1 text-center">
-                <h3 className="font-medium text-lg leading-tight line-clamp-1 group-hover:text-copper transition-colors duration-300">
-                    {fragrance.name}
-                </h3>
-                <p className="text-xs text-text-muted uppercase tracking-widest line-clamp-1">
-                    {fragrance.concentration}
-                    {fragrance.year && <span className="text-text-tertiary"> · {fragrance.year}</span>}
-                </p>
-            </div>
-        </Link>
-    );
-}

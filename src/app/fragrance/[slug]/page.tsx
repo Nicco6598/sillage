@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowUpRight, Star } from "lucide-react";
-import { getFragranceBySlug, getFragranceReviews } from "@/lib/fragrance-db";
+import { getFragranceBySlug, getFragranceReviews, getManualSimilarities, getUserSimilarityVotes } from "@/lib/fragrance-db";
 import { notFound } from "next/navigation";
 import { ReviewAction } from "@/components/fragrance/review-action";
 import { DynamicPerformance } from "@/components/fragrance/dynamic-performance";
@@ -11,6 +11,7 @@ import { RecentlyViewed } from "@/components/features/recently-viewed";
 import { CollectionActions } from "@/components/fragrance/collection-actions";
 import { ReviewsList } from "@/components/fragrance/reviews-list";
 import { createClient } from "@/lib/supabase/server";
+import { FragranceSimilarities } from "@/components/fragrance/fragrance-similarities";
 
 interface FragrancePageProps {
     params: Promise<{ slug: string }>;
@@ -30,6 +31,17 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const currentUserId = user?.id || null;
+
+    const manualSimilarities = await getManualSimilarities(fragrance.id);
+    let similaritiesWithUserVotes = manualSimilarities;
+
+    if (currentUserId) {
+        const userVotes = await getUserSimilarityVotes(fragrance.id, currentUserId);
+        similaritiesWithUserVotes = manualSimilarities.map(s => ({
+            ...s,
+            userVote: userVotes[s.similarityId] || undefined
+        }));
+    }
 
     return (
         <div className="w-full pt-32 md:pt-40 pb-24">
@@ -291,6 +303,17 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                         {/* Season Votes */}
                         <SeasonVotes reviews={reviews} />
                     </div>
+                </div>
+
+                {/* Fragrance Similarities Section */}
+                <div className="mt-16">
+                    <FragranceSimilarities
+                        fragranceId={fragrance.id}
+                        fragranceSlug={fragrance.slug}
+                        fragranceName={fragrance.name}
+                        initialSimilarities={similaritiesWithUserVotes}
+                        userId={currentUserId}
+                    />
                 </div>
 
                 {/* REVIEWS SECTION */}

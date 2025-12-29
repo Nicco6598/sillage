@@ -4,6 +4,14 @@ import { useState, useMemo } from "react";
 import { Clock, Wind, User, Filter, X } from "lucide-react";
 import { Season } from "@/types/fragrance";
 
+interface Review {
+    productionDate?: string | null;
+    longevity?: string | number | null;
+    sillage?: string | number | null;
+    genderVote?: string | null;
+    seasonVote?: string | null;
+}
+
 interface CommunityStatsProps {
     fragrance: {
         longevity: number;
@@ -11,7 +19,7 @@ interface CommunityStatsProps {
         gender: "masculine" | "feminine" | "unisex";
         seasons: Season[];
     };
-    allReviews: any[]; // Containing detailed votes
+    allReviews: Review[]; // Containing detailed votes
 }
 
 export function CommunityStats({ fragrance, allReviews }: CommunityStatsProps) {
@@ -243,7 +251,7 @@ export function CommunityStats({ fragrance, allReviews }: CommunityStatsProps) {
                     <div>
                         <div className="mb-6">
                             <h4 className="font-serif text-xl mb-2">Stagionalità</h4>
-                            <p className="text-xs text-text-muted">Preferenze d'uso della community</p>
+                            <p className="text-xs text-text-muted">Preferenze d&apos;uso della community</p>
                         </div>
 
                         <div className="space-y-5">

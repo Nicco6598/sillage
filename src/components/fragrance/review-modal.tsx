@@ -67,6 +67,7 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
     useEffect(() => {
         if (isOpen && editingReview) {
             const ratingVal = Number(editingReview.rating) || 0;
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setRating([ratingVal]);
             setManualInput(ratingVal > 0 ? ratingVal.toFixed(2) : "");
             setValSillage([Number(editingReview.sillage) || 3.0]);
@@ -387,7 +388,7 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                                 );
                                             })}
                                         </div>
-                                        <p className="text-[10px] text-text-muted mt-2">Seleziona l'anno indicato sulla confezione.</p>
+                                        <p className="text-[10px] text-text-muted mt-2">Seleziona l&apos;anno indicato sulla confezione.</p>
                                     </div>
                                 </div>
 
@@ -439,62 +440,6 @@ function DetailedSlider({ name, value, onChange, step = 0.1 }: { name: string, v
             <div className="flex justify-between text-[10px] text-text-muted mt-2 font-mono ml-[-6px] mr-[-6px]">
                 <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
             </div>
-        </div>
-    );
-}
-
-function RadioOption({ name, value, label }: { name: string, value: string, label: string }) {
-    return (
-        <label className="flex items-center gap-2 cursor-pointer group select-none">
-            <div className="relative flex items-center">
-                <input type="radio" name={name} value={value} className="peer sr-only " />
-                <div className="w-4 h-4 border border-border-primary rounded-full peer-checked:border-accent peer-checked:bg-accent transition-all"></div>
-            </div>
-            <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors uppercase tracking-wider text-xs">{label}</span>
-        </label>
-    );
-}
-
-function SeasonSelector({ name }: { name: string }) {
-    const [selected, setSelected] = useState<string[]>([]);
-    const seasons = [
-        { value: "spring", label: "Primavera", Icon: SpringIcon, color: "text-emerald-500" },
-        { value: "summer", label: "Estate", Icon: SummerIcon, color: "text-amber-500" },
-        { value: "autumn", label: "Autunno", Icon: AutumnIcon, color: "text-orange-600" },
-        { value: "winter", label: "Inverno", Icon: WinterIcon, color: "text-sky-500" },
-    ];
-
-    const toggleSeason = (val: string) => {
-        if (selected.includes(val)) {
-            setSelected(selected.filter(s => s !== val));
-        } else {
-            setSelected([...selected, val]);
-        }
-    };
-
-    return (
-        <div className="grid grid-cols-4 gap-3">
-            <input type="hidden" name={name} value={selected.join(",")} />
-            {seasons.map((s) => (
-                <button
-                    key={s.value}
-                    type="button"
-                    onClick={() => toggleSeason(s.value)}
-                    className={cn(
-                        "flex flex-col items-center gap-2 p-2 sm:py-4 border transition-all cursor-pointer hover:bg-bg-secondary min-w-0 relative",
-                        selected.includes(s.value)
-                            ? "border-text-primary bg-bg-secondary"
-                            : "border-border-primary opacity-60 hover:opacity-100"
-                    )}
-                >
-                    <s.Icon className={cn("h-6 w-6 sm:h-8 sm:w-8", selected.includes(s.value) ? "text-text-primary" : s.color)} />
-                    <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-center hidden sm:block truncate w-full">{s.label}</span>
-
-                    {selected.includes(s.value) && (
-                        <div className="absolute top-1 right-1 w-2 h-2 bg-text-primary rounded-full md:hidden"></div>
-                    )}
-                </button>
-            ))}
         </div>
     );
 }

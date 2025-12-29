@@ -7,6 +7,7 @@ import { useState, useCallback, useTransition, useEffect } from "react";
 import { Search, SlidersHorizontal, X, Check, ChevronLeft, ChevronRight, Star, ArrowUpRight } from "lucide-react";
 import type { Fragrance } from "@/types/fragrance";
 import { cn } from "@/lib/utils";
+import { FragranceCard } from "@/components/fragrance/fragrance-card";
 import { Slider } from "@/components/ui/slider";
 
 interface FilterOptions {
@@ -63,6 +64,7 @@ export function ExploreContent({
 
     // Sync local filters with URL params when they change externally
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalFilters({
             gender: currentFilters.gender ?? "",
             brand: currentFilters.brand ?? "",
@@ -517,72 +519,7 @@ export function ExploreContent({
     );
 }
 
-// Fragrance Card Component
-function FragranceCard({ fragrance }: { fragrance: Fragrance }) {
-    return (
-        <Link
-            href={`/fragrance/${fragrance.slug}`}
-            className="group block"
-        >
-            <div className="relative overflow-hidden bg-bg-tertiary aspect-[3/4] mb-4 group/image ring-1 ring-inset ring-white/10 dark:ring-white/5 shadow-soft hover:shadow-elevated transition-all duration-300 hover:-translate-y-1">
-                {/* Subtle depth gradient */}
-                <div className="absolute inset-0 bg-gradient-to-b from-white/8 to-transparent dark:from-white/[0.03] pointer-events-none z-10" />
 
-                {fragrance.imageUrl ? (
-                    <Image
-                        src={fragrance.imageUrl}
-                        alt={fragrance.name}
-                        fill
-                        className="object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-bg-secondary to-bg-tertiary" />
-                )}
-
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-20" />
-
-                {/* Rating Badge */}
-                <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-bg-primary/90 backdrop-blur-sm text-xs font-mono opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-subtle z-30">
-                    <Star className="w-3 h-3 fill-gold text-gold" />
-                    {fragrance.rating.toFixed(1)}
-                </div>
-
-                {/* View Arrow */}
-                <div className="absolute bottom-3 right-3 w-8 h-8 flex items-center justify-center bg-copper text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-75 shadow-subtle z-30">
-                    <ArrowUpRight className="w-4 h-4" />
-                </div>
-
-                {/* New Badge */}
-                {fragrance.isNew && (
-                    <div className="absolute top-3 left-3 px-2 py-1 bg-gold text-[10px] font-mono uppercase tracking-wider text-white shadow-subtle z-30">
-                        New
-                    </div>
-                )}
-            </div>
-
-            {/* Info */}
-            <div className="space-y-1">
-                <h3 className="font-medium leading-tight line-clamp-1 group-hover:text-copper transition-colors duration-300">
-                    {fragrance.name}
-                </h3>
-                <p className="text-sm text-text-muted uppercase tracking-wider line-clamp-1">
-                    {fragrance.brand.name}
-                </p>
-                <div className="flex items-center gap-2 pt-1">
-                    <span className="text-xs text-text-tertiary">{fragrance.concentration}</span>
-                    {fragrance.year && (
-                        <>
-                            <span className="text-text-muted">·</span>
-                            <span className="text-xs text-text-tertiary">{fragrance.year}</span>
-                        </>
-                    )}
-                </div>
-            </div>
-        </Link>
-    );
-}
 
 // Filter Chip Component
 function FilterChip({ label, onRemove, className }: { label: string; onRemove: () => void; className?: string }) {

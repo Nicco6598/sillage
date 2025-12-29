@@ -180,8 +180,8 @@ export default function LoginPage() {
             <div className="hidden lg:flex flex-1 bg-bg-secondary border-l border-border-primary items-center justify-center">
                 <div className="text-center px-12">
                     <p className="font-serif text-3xl xl:text-4xl leading-relaxed text-text-secondary max-w-md">
-                        "Il profumo è la forma più <br />
-                        <span className="text-copper italic">intensa</span> della memoria."
+                        &quot;Il profumo è la forma più <br />
+                        <span className="text-copper italic">intensa</span> della memoria.&quot;
                     </p>
                     <p className="mt-6 text-xs font-mono uppercase tracking-widest text-text-muted">
                         — Jean-Paul Guerlain
