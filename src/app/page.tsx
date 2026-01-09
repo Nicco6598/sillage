@@ -152,7 +152,7 @@ export default async function Home() {
             <h2 className="font-serif text-3xl md:text-4xl">Esplora per Categoria</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {/* Explore Fragrances */}
             <Link
               href="/explore"
@@ -170,28 +170,6 @@ export default async function Home() {
                 </h3>
                 <div className="flex items-center gap-2 text-sm text-text-muted group-hover:text-copper transition-colors">
                   <span className="uppercase tracking-widest">Esplora</span>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Notes */}
-            <Link
-              href="/notes"
-              className="group relative h-64 md:h-80 overflow-hidden bg-bg-tertiary border border-border-primary hover:border-gold shadow-soft hover:shadow-elevated transition-all duration-300 hover:-translate-y-0.5"
-            >
-              {/* Depth gradient */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent dark:from-white/[0.02] pointer-events-none" />
-              <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute inset-0 flex flex-col justify-end p-8 relative z-10">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-2">
-                  {stats.notes.toLocaleString()}+ ingredienti
-                </span>
-                <h3 className="font-serif text-3xl md:text-4xl mb-4 group-hover:text-gold transition-colors">
-                  Note Olfattive
-                </h3>
-                <div className="flex items-center gap-2 text-sm text-text-muted group-hover:text-gold transition-colors">
-                  <span className="uppercase tracking-widest">Scopri</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>

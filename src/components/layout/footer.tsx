@@ -8,7 +8,6 @@ const footerLinks = {
     Esplora: [
         { label: "Tutte le Fragranze", href: "/explore" },
         { label: "Brands", href: "/brands" },
-        { label: "Note Olfattive", href: "/notes" },
         { label: "Novità", href: "/explore?sort=newest" },
     ],
     Risorse: [
