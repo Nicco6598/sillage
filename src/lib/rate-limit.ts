@@ -86,10 +86,10 @@ export function getTimeUntilReset(reset: Date): string {
     }
 
     if (totalMinutes > 0) {
-        if (seconds > 0 && totalMinutes < 5) {
-            return `${totalMinutes} minut${totalMinutes === 1 ? "o" : "i"} e ${seconds} second${seconds === 1 ? "o" : "i"}`;
+        if (seconds > 0 && minutes < 5) {
+            return `${minutes} minut${minutes === 1 ? "o" : "i"} e ${seconds} second${seconds === 1 ? "o" : "i"}`;
         }
-        return `${totalMinutes} minut${totalMinutes === 1 ? "o" : "i"}`;
+        return `${minutes} minut${minutes === 1 ? "o" : "i"}`;
     }
 
     return `${seconds} second${seconds === 1 ? "o" : "i"}`;
