@@ -88,7 +88,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
         }
     }, [state.success, onClose]);
 
-    // Real-time countdown for rate limit
     const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
 
     useEffect(() => {
@@ -99,7 +98,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
 
                 if (diff <= 0) {
                     setTimeRemaining(null);
-                    // Clear the error state when timer expires
                     return;
                 }
 
@@ -250,35 +248,40 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                             <label className="block text-xs uppercase tracking-widest text-text-muted">La tua esperienza</label>
                                         </div>
 
-                                        {/* Show error box only for moderation/validation errors, not rate limits */}
-                                        {state.message && !state.success && !state.message.includes("Puoi inviare una recensione ogni") && (
-                                            <div className="mb-3 bg-red-500/5 border border-red-500/20 p-3 flex gap-3 items-start animate-in fade-in slide-in-from-bottom-2 rounded-sm">
-                                                <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-                                                <div className="text-sm">
-                                                    <p className="font-medium text-red-600 mb-0.5">Impossibile pubblicare</p>
-                                                    <p className="text-text-secondary text-xs leading-relaxed">{state.message}</p>
+                                        <div className={cn(
+                                            "transition-all",
+                                            state.message && !state.success && !state.message.includes("Puoi inviare una recensione ogni")
+                                                ? "bg-red-500/5 border border-red-500/20 p-4 rounded-sm"
+                                                : ""
+                                        )}>
+                                            {state.message && !state.success && !state.message.includes("Puoi inviare una recensione ogni") && (
+                                                <div className="mb-3 flex gap-3 items-start animate-in fade-in slide-in-from-bottom-2">
+                                                    <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                                                    <div className="text-sm">
+                                                        <p className="font-medium text-red-600 mb-0.5">Impossibile pubblicare</p>
+                                                        <p className="text-text-secondary text-xs leading-relaxed">{state.message}</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-
-                                        <textarea
-                                            name="comment"
-                                            rows={4}
-                                            value={comment}
-                                            onChange={(e) => setComment(e.target.value)}
-                                            className={cn(
-                                                "w-full bg-bg-secondary border p-4 outline-none transition-all resize-none text-sm leading-relaxed",
-                                                state.message && !state.success && !state.message.includes("Puoi inviare una recensione ogni")
-                                                    ? "border-red-500/50 focus:border-red-500"
-                                                    : "border-border-primary focus:border-text-primary"
                                             )}
-                                            placeholder="Racconta cosa ti piace (o non ti piace) di questa fragranza..."
-                                        />
+
+                                            <textarea
+                                                name="comment"
+                                                rows={4}
+                                                value={comment}
+                                                onChange={(e) => setComment(e.target.value)}
+                                                className={cn(
+                                                    "w-full bg-bg-secondary border p-4 outline-none transition-all resize-none text-sm leading-relaxed",
+                                                    state.message && !state.success && !state.message.includes("Puoi inviare una recensione ogni")
+                                                        ? "border-red-500/50 focus:border-red-500"
+                                                        : "border-border-primary focus:border-text-primary"
+                                                )}
+                                                placeholder="Racconta cosa ti piace (o non ti piace) di questa fragranza..."
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 pt-8 border-t border-border-primary">
-                                    {/* Sillage */}
                                     <div>
                                         <div className="flex items-baseline justify-between mb-4">
                                             <div>
@@ -306,7 +309,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12 md:gap-y-8">
-                                    {/* Gender Vote */}
                                     <div>
                                         <label className="block text-xs uppercase tracking-widest text-text-muted mb-3 md:mb-4">Secondo te è più...</label>
                                         <input type="hidden" name="genderVote" value={genderVote} />
