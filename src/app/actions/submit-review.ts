@@ -27,6 +27,7 @@ export type ReviewState = {
     message?: string;
     errors?: Record<string, string[]>;
     success?: boolean;
+    resetTimestamp?: number; // Unix timestamp for rate limit reset
 }
 
 // Basic profanity filter (runs before AI moderation)
@@ -60,7 +61,8 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
             const timeLeft = getTimeUntilReset(rateLimitResult.reset);
             return {
                 success: false,
-                message: `Puoi inviare una recensione ogni 5 minuti. Riprova tra ${timeLeft}.`
+                message: `Puoi inviare una recensione ogni 5 minuti. Riprova tra ${timeLeft}.`,
+                resetTimestamp: rateLimitResult.reset.getTime()
             };
         }
     } catch (error) {

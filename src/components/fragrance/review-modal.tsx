@@ -2,7 +2,7 @@
 "use client";
 
 import { useActionState, useState, useEffect } from "react";
-import { submitReview, updateReview } from "@/app/actions/submit-review";
+import { submitReview, updateReview, type ReviewState } from "@/app/actions/submit-review";
 import { Star, X, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -29,7 +29,7 @@ interface ReviewModalProps {
     editingReview?: EditingReview | null;
 }
 
-const initialState = {
+const initialState: ReviewState = {
     message: "",
     errors: {},
     success: false
@@ -37,37 +37,27 @@ const initialState = {
 
 export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragranceName, editingReview }: ReviewModalProps) {
     const isEditing = !!editingReview;
-    const [state, formAction, isPending] = useActionState(
+    // @ts-expect-error - useActionState type inference issue with optional fields
+    const [stateRaw, formAction, isPending] = useActionState(
         isEditing ? updateReview : submitReview,
         initialState
     );
+    const state = stateRaw as ReviewState;
 
-    // Rating state
     const [rating, setRating] = useState([0]);
     const [manualInput, setManualInput] = useState("");
-
-    // Local state for sliders
     const [valSillage, setValSillage] = useState([3.0]);
     const [valLongevity, setValLongevity] = useState([3.0]);
-
-    // Comment state
     const [comment, setComment] = useState("");
-
-    // Gender vote state
     const [genderVote, setGenderVote] = useState<string>("");
-
-    // Season vote state
     const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
-
-    // Batch and production date state
     const [batchCode, setBatchCode] = useState("");
     const [productionDate, setProductionDate] = useState("");
 
-    // Pre-fill values when editing
+    // Pre-fill form when editing an existing review
     useEffect(() => {
         if (isOpen && editingReview) {
             const ratingVal = Number(editingReview.rating) || 0;
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setRating([ratingVal]);
             setManualInput(ratingVal > 0 ? ratingVal.toFixed(2) : "");
             setValSillage([Number(editingReview.sillage) || 3.0]);
@@ -78,7 +68,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
             setBatchCode(editingReview.batchCode || "");
             setProductionDate(editingReview.productionDate || "");
         } else if (!isOpen) {
-            // Reset when modal closes
             setRating([0]);
             setManualInput("");
             setValSillage([3.0]);
@@ -90,8 +79,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
             setProductionDate("");
         }
     }, [isOpen, editingReview]);
-
-    // Close on success
     useEffect(() => {
         if (state.success) {
             const t = setTimeout(() => {
@@ -101,11 +88,52 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
         }
     }, [state.success, onClose]);
 
-    // Handle manual rating input changes (typing)
-    const handleManualChange = (val: string) => {
-        setManualInput(val); // Just update text first to allow typing "2." or "2.3"
+    // Real-time countdown for rate limit
+    const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
 
-        // Try to parse and update slider in background
+    useEffect(() => {
+        if (state.resetTimestamp && !state.success) {
+            const updateCountdown = () => {
+                const now = Date.now();
+                const diff = state.resetTimestamp! - now;
+
+                if (diff <= 0) {
+                    setTimeRemaining(null);
+                    // Clear the error state when timer expires
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const totalMinutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+
+                let formatted = "";
+                if (hours > 0) {
+                    formatted = `${hours} or${hours === 1 ? "a" : "e"}`;
+                    if (minutes > 0) formatted += ` e ${minutes} minut${minutes === 1 ? "o" : "i"}`;
+                } else if (minutes > 0) {
+                    formatted = `${minutes} minut${minutes === 1 ? "o" : "i"}`;
+                    if (seconds > 0 && minutes < 5) formatted += ` e ${seconds} second${seconds === 1 ? "o" : "i"}`;
+                } else {
+                    formatted = `${seconds} second${seconds === 1 ? "o" : "i"}`;
+                }
+
+                setTimeRemaining(formatted);
+            };
+
+            updateCountdown();
+            const interval = setInterval(updateCountdown, 1000);
+
+            return () => clearInterval(interval);
+        } else {
+            setTimeRemaining(null);
+        }
+    }, [state.resetTimestamp, state.success]);
+
+    const handleManualChange = (val: string) => {
+        setManualInput(val);
         const floatVal = parseFloat(val.replace(',', '.'));
         if (!isNaN(floatVal)) {
             if (floatVal >= 0 && floatVal <= 5) {
@@ -115,11 +143,8 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
             setRating([0]);
         }
     };
-
-    // Handle slider changes
     const handleSliderChange = (val: number[]) => {
         setRating(val);
-        // Sync text immediately when dragging slider
         setManualInput(val[0].toFixed(2));
     };
 
@@ -129,7 +154,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
             <div className="w-full max-w-2xl bg-bg-primary border border-border-primary shadow-2xl overflow-hidden relative max-h-[90vh] overflow-y-auto">
                 <div className="flex flex-col h-full max-h-[90vh]">
-                    {/* Sticky Header */}
                     <div className="sticky top-0 left-0 right-0 bg-bg-primary z-20 border-b border-border-primary px-6 py-4 flex items-center justify-between shrink-0">
                         <div>
                             <h2 className="font-serif text-xl md:text-3xl">
@@ -161,8 +185,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                 {isEditing && editingReview && (
                                     <input type="hidden" name="reviewId" value={editingReview.id} />
                                 )}
-
-                                {/* Rating */}
                                 <div>
                                     <label className="block text-xs uppercase tracking-widest text-text-muted mb-3">Voto Complessivo *</label>
                                     <div className="flex flex-col gap-4 bg-bg-secondary p-6 border border-border-primary">
@@ -180,7 +202,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                                 ))}
                                             </div>
 
-                                            {/* Custom Input */}
                                             <input
                                                 type="text"
                                                 inputMode="decimal"
@@ -189,7 +210,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                                 onBlur={() => {
                                                     const val = parseFloat(manualInput.replace(',', '.'));
                                                     if (isNaN(val) || val < 1) {
-                                                        // If empty or invalid on blur, reset to safe minimum or keep 0 if intended
                                                         if (val === 0) {
                                                             setRating([0]);
                                                             setManualInput("");
@@ -224,16 +244,14 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                     {state.errors?.rating && <p className="text-red-500 text-xs mt-2">{state.errors.rating}</p>}
                                 </div>
 
-                                {/* Comment */}
                                 <div className="grid gap-8">
                                     <div className="relative">
                                         <div className="flex justify-between items-baseline mb-3">
                                             <label className="block text-xs uppercase tracking-widest text-text-muted">La tua esperienza</label>
-                                            {/* Character count or extra info could go here */}
                                         </div>
 
-                                        {/* Error Alert Box */}
-                                        {state.message && !state.success && (
+                                        {/* Show error box only for moderation/validation errors, not rate limits */}
+                                        {state.message && !state.success && !state.message.includes("Puoi inviare una recensione ogni") && (
                                             <div className="mb-3 bg-red-500/5 border border-red-500/20 p-3 flex gap-3 items-start animate-in fade-in slide-in-from-bottom-2 rounded-sm">
                                                 <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
                                                 <div className="text-sm">
@@ -250,7 +268,7 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                             onChange={(e) => setComment(e.target.value)}
                                             className={cn(
                                                 "w-full bg-bg-secondary border p-4 outline-none transition-all resize-none text-sm leading-relaxed",
-                                                state.message && !state.success
+                                                state.message && !state.success && !state.message.includes("Puoi inviare una recensione ogni")
                                                     ? "border-red-500/50 focus:border-red-500"
                                                     : "border-border-primary focus:border-text-primary"
                                             )}
@@ -259,7 +277,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                     </div>
                                 </div>
 
-                                {/* Detailed Ratings */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 pt-8 border-t border-border-primary">
                                     {/* Sillage */}
                                     <div>
@@ -274,7 +291,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                             <DetailedSlider name="sillage" value={valSillage} onChange={setValSillage} step={0.1} />
                                         </div>
                                     </div>
-                                    {/* Longevity */}
                                     <div>
                                         <div className="flex items-baseline justify-between mb-4">
                                             <div>
@@ -316,7 +332,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                             ))}
                                         </div>
                                     </div>
-                                    {/* Season Vote */}
                                     <div>
                                         <label className="block text-xs uppercase tracking-widest text-text-muted mb-3 md:mb-4">Stagioni ideali</label>
                                         <input type="hidden" name="seasonVote" value={selectedSeasons.join(",")} />
@@ -352,7 +367,6 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                     </div>
                                 </div>
 
-                                {/* Batch & Production Date */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
                                     <div>
                                         <label className="block text-xs uppercase tracking-widest text-text-muted mb-3">Codice Batch (Opzionale)</label>
@@ -394,18 +408,29 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
 
                                 <div className="pt-4">
                                     <button
-                                        disabled={isPending}
+                                        disabled={isPending || !!timeRemaining}
                                         type="submit"
                                         className={cn(
-                                            "w-full py-4 uppercase tracking-widest transition-all font-medium cursor-pointer flex items-center justify-center gap-2",
-                                            isPending ? "bg-text-muted opacity-50 cursor-not-allowed" :
-                                                state.message && !state.success
-                                                    ? "bg-red-500 text-white hover:bg-red-600 animate-shake" // Error state with shake
-                                                    : "bg-text-primary text-bg-primary hover:bg-text-secondary" // Normal state
+                                            "w-full py-4 transition-all font-medium flex flex-col items-center justify-center gap-1.5",
+                                            isPending || timeRemaining
+                                                ? "bg-red-500/10 border border-red-500/20 text-red-600/70 cursor-not-allowed"
+                                                : state.message && !state.success
+                                                    ? "bg-red-500 text-white hover:bg-red-600 cursor-pointer uppercase tracking-widest text-sm"
+                                                    : "bg-text-primary text-bg-primary hover:bg-text-secondary cursor-pointer uppercase tracking-widest text-sm"
                                         )}
                                     >
                                         {isPending ? (
-                                            "Invio in corso..."
+                                            <span className="uppercase tracking-widest text-sm">Invio in corso...</span>
+                                        ) : timeRemaining ? (
+                                            <>
+                                                <div className="flex items-center gap-2">
+                                                    <AlertCircle className="h-4 w-4" />
+                                                    <span className="text-xs font-semibold uppercase tracking-wider">Attendi</span>
+                                                </div>
+                                                <span className="text-xs font-normal normal-case tracking-normal leading-relaxed px-4 text-center">
+                                                    Puoi inviare una recensione tra {timeRemaining}
+                                                </span>
+                                            </>
                                         ) : state.message && !state.success ? (
                                             <>
                                                 <AlertCircle className="h-4 w-4" />
@@ -416,14 +441,12 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
                                         )}
                                     </button>
                                 </div>
-
-                                {/* Error message moved to top */}
                             </form>
                         )}
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 
