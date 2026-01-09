@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sillage
 
-## Getting Started
+**Sillage** è il nuovo punto di riferimento digitale per la profumeria artistica in Italia. Una piattaforma premium progettata per esplorare, recensire e collezionare fragranze, unendo un'estetica curata a prestazioni tecnologiche d'avanguardia.
 
-First, run the development server:
+## 🚀 Visione & Stack Tecnologico
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Il progetto nasce con l'obiettivo di "umanizzare" la tecnologia, mettendola al servizio di un'arte sensoriale. Per farlo, abbiamo scelto uno stack moderno e orientato alle performance:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Framework:** Next.js 16 (App Router)
+- **Database:** Supabase (PostgreSQL)
+- **ORM:** Drizzle ORM
+- **Styling:** Tailwind CSS + Motion (per micro-interazioni premium)
+- **AI:** Google Gemini (per la moderazione intelligente dei contenuti)
+- **Infrastructure:** Upstash (Redis & Rate-limiting)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🏛️ Decisioni Architetturali
 
-## Learn More
+In Sillage, ogni scelta tecnica è stata guidata dalla ricerca dell'equilibrio tra **Performance**, **Type-Safety** e **Developer Experience**.
 
-To learn more about Next.js, take a look at the following resources:
+### 🛠️ Perché Drizzle ORM?
+Abbiamo preferito **Drizzle** rispetto a alternative più massicce (come Prisma) per diversi motivi:
+1.  **Zero Overhead:** Drizzle non ha una "runtime" pesante. Ciò che scrivi è molto vicino all'SQL puro, garantendo query fulminee.
+2.  **Type-Safety Nativa:** Essendo "TypeScript-first", Drizzle ci permette di avere una sincronizzazione perfetta tra lo schema del database e i tipi del frontend, riducendo drasticamente i bug in produzione.
+3.  **Edge-Ready:** La sua leggerezza ci permette di eseguire il codice su infrastrutture Edge senza compromettere i tempi di "cold start".
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### ⚡ Perché Server Actions?
+Invece di costruire una REST API tradizionale, abbiamo adottato le **Next.js Server Actions** per gestire le interazioni (come l'invio di recensioni o la gestione del profilo):
+1.  **Seamless Integration:** Le azioni server eliminano la necessità di gestire endpoint API manuali e fetch complessi nel client.
+2.  **Unified Validation:** Utilizziamo Zod per validare i dati una sola volta, sia nel client che nel server, garantendo coerenza e sicurezza.
+3.  **Progressive Enhancement:** Le Server Actions permettono alla piattaforma di mantenere funzionalità di base anche in scenari con connettività limitata, migliorando l'accessibilità complessiva.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## ✨ Funzionalità Chiave
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Database Olfattivo:** Navigazione avanzata per brand, note e piramidi olfattive.
+- **AI Moderation:** Sistema di recensioni protetto da AI per mantenere un tono costruttivo e rispettoso nella community.
+- **Security First:** Protezione anti-spam avanzata con validazione email e rate-limiting granulare.
+- **Design 3D & Depth:** Un'interfaccia "glassmorphic" con ombre morbide e gradienti studiati per un feedback visivo di alto profilo.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Sviluppo Locale
+
+1.  Clona il repository.
+2.  Installa le dipendenze:
+    ```bash
+    pnpm install
+    ```
+3.  Configura le variabili d'ambiente nel file `.env.local` (Supabase, Gemini API, Upstash).
+4.  Avvia il server di sviluppo:
+    ```bash
+    pnpm dev
+    ```
+
+---
+
+Creato con passione per la community olfattiva italiana.
