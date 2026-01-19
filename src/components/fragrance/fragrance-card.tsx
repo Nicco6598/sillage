@@ -2,24 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Star } from "lucide-react";
-import { useState } from "react";
+import { Star } from "lucide-react";
 import type { Fragrance } from "@/types/fragrance";
-import { cn, formatRating } from "@/lib/utils";
-
-interface FragranceCardProps {
-    fragrance: Fragrance;
-}
+import { cn } from "@/lib/utils";
 
 /**
  * Gender gradient mappings for visual distinction
  */
-const genderGradients = {
-    masculine: "from-blue-500/10 to-indigo-500/10",
-    feminine: "from-pink-500/10 to-rose-500/10",
-    unisex: "from-violet-500/10 to-purple-500/10",
-};
-
 /**
  * Premium Fragrance Card - Stone & Silk Design System
  * Used across Explore, Home, and Brand pages for a consistent aesthetic.

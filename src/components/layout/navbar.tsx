@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { surpriseMe } from "@/app/actions/discovery";
-import { Search, Heart, Menu, X, Sparkles, ArrowUpRight, ArrowRight, User as UserIcon, LogOut, Settings } from "lucide-react";
+import { Search, Heart, Menu, X, Sparkles, ArrowRight, User as UserIcon, LogOut, Settings, Home, Compass, Building2, Users } from "lucide-react";
 
 interface User {
     id: string;
@@ -16,7 +16,7 @@ interface User {
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { signout } from "@/app/actions/auth";
 
@@ -27,7 +27,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { label: "Esplora", href: "/explore" },
-    { label: "Brands", href: "/brands" },
+    { label: "Brand", href: "/brands" },
     { label: "Community", href: "/community" },
 ];
 
@@ -37,14 +37,16 @@ const navItems: NavItem[] = [
 export function Navbar() {
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [mobileMenuKey, setMobileMenuKey] = useState<string | null>(null);
     const [mobileSearchQuery, setMobileSearchQuery] = useState("");
 
     // Auth state
     const [user, setUser] = useState<User | null>(null);
     const [username, setUsername] = useState<string>("");
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -55,7 +57,8 @@ export function Navbar() {
     }, []);
 
     useEffect(() => {
-        if (isMobileMenuOpen) {
+        const isMenuVisible = isMobileMenuOpen && mobileMenuKey === `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+        if (isMenuVisible) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "";
@@ -63,7 +66,7 @@ export function Navbar() {
         return () => {
             document.body.style.overflow = "";
         };
-    }, [isMobileMenuOpen]);
+    }, [isMobileMenuOpen, mobileMenuKey, pathname, searchParams]);
 
     useEffect(() => {
         const getUser = async () => {
@@ -89,16 +92,36 @@ export function Navbar() {
         return () => subscription.unsubscribe();
     }, [supabase, pathname]);
 
+    useEffect(() => {
+        if (!isMobileMenuOpen) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setIsMobileMenuOpen(false);
+                setMobileMenuKey(null);
+                setMobileSearchQuery("");
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isMobileMenuOpen]);
+
     const handleMobileSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (mobileSearchQuery.trim()) {
             router.push(`/explore?q=${encodeURIComponent(mobileSearchQuery.trim())}`);
             setIsMobileMenuOpen(false);
+            setMobileMenuKey(null);
             setMobileSearchQuery("");
         }
     };
 
-    const closeMenu = () => setIsMobileMenuOpen(false);
+    const closeMenu = () => {
+        setIsMobileMenuOpen(false);
+        setMobileMenuKey(null);
+        setMobileSearchQuery("");
+    };
+    const menuKey = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+    const isMobileMenuVisible = isMobileMenuOpen && mobileMenuKey === menuKey;
 
     return (
         <>
@@ -185,7 +208,10 @@ export function Navbar() {
                         </div>
 
                         <button
-                            onClick={() => setIsMobileMenuOpen(true)}
+                            onClick={() => {
+                                setMobileMenuKey(menuKey);
+                                setIsMobileMenuOpen(true);
+                            }}
                             className="lg:hidden w-10 h-10 flex items-center justify-center text-text-primary"
                             aria-label="Menu"
                         >
@@ -199,164 +225,176 @@ export function Navbar() {
             <div
                 className={cn(
                     "fixed inset-0 z-[100] lg:hidden transition-opacity duration-300",
-                    isMobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                    isMobileMenuVisible ? "opacity-100" : "opacity-0 pointer-events-none"
                 )}
             >
-                <div
-                    className="absolute inset-0 bg-bg-primary"
-                    onClick={closeMenu}
-                />
+                <div className="absolute inset-0 bg-bg-primary/70 backdrop-blur-sm" onClick={closeMenu} />
 
-                <div className={cn(
-                    "relative h-full flex flex-col bg-bg-primary transition-transform duration-500",
-                    isMobileMenuOpen ? "translate-y-0" : "-translate-y-8"
-                )}>
-                    {/* Header - Compact */}
+                <div
+                    className={cn(
+                        "absolute inset-0 bg-bg-primary transition-transform duration-500",
+                        isMobileMenuVisible ? "translate-x-0" : "translate-x-full"
+                    )}
+                >
                     <div className="flex items-center justify-between px-6 h-14 border-b border-border-primary">
                         <Logo size="md" className="text-text-primary" />
-                        <button
-                            onClick={closeMenu}
-                            className="w-9 h-9 flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
-                            aria-label="Chiudi"
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <button
+                                onClick={closeMenu}
+                                className="w-9 h-9 flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
+                                aria-label="Chiudi"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Main Content - Scrollable */}
-                    <div className="flex-1 overflow-y-auto">
-                        {/* HERO: User Section - PROMINENT */}
-                        {user ? (
-                            <div className="px-6 py-8 border-b border-border-primary">
-                                <Link
-                                    href="/profile"
-                                    onClick={closeMenu}
-                                    className="group flex items-center gap-5 hover:opacity-80 transition-opacity"
+                    <div className="h-[calc(100vh-56px)] overflow-y-auto">
+                        <div className="px-6 pt-6 pb-4 border-b border-border-primary">
+                            <form onSubmit={handleMobileSearch} className="relative border border-border-secondary/50 focus-within:border-copper transition-colors">
+                                <input
+                                    type="text"
+                                    value={mobileSearchQuery}
+                                    onChange={(e) => setMobileSearchQuery(e.target.value)}
+                                    placeholder="Cerca fragranze, brand, note…"
+                                    className="w-full bg-transparent px-4 py-3 pr-12 text-sm placeholder:text-text-muted outline-none"
+                                />
+                                <button
+                                    type="submit"
+                                    className="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-text-muted hover:text-copper transition-colors"
+                                    aria-label="Cerca"
                                 >
-                                    <div className="w-16 h-16 border border-copper bg-copper/10 flex items-center justify-center text-copper">
-                                        <UserIcon className="h-7 w-7" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-serif text-3xl group-hover:text-copper transition-colors">{username}</p>
-                                        <p className="text-sm text-text-muted mt-1">Vai al tuo profilo →</p>
-                                    </div>
-                                </Link>
-                                {/* User Quick Actions */}
-                                <div className="flex items-center gap-3 mt-5 pt-5 border-t border-border-secondary/30">
-                                    <Link
-                                        href="/settings"
-                                        onClick={closeMenu}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-mono uppercase tracking-widest text-text-muted hover:text-copper border border-border-secondary/50 hover:border-copper transition-colors"
-                                    >
-                                        <Settings className="h-3.5 w-3.5" />
-                                        Impostazioni
-                                    </Link>
-                                    <form action={signout} className="flex-1">
-                                        <button
-                                            type="submit"
-                                            className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-mono uppercase tracking-widest text-red-500/70 hover:text-red-500 border border-red-500/20 hover:border-red-500/50 transition-colors"
-                                        >
-                                            <LogOut className="h-3.5 w-3.5" />
-                                            Esci
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="px-6 py-8 border-b border-border-primary">
-                                <h2 className="font-serif text-3xl mb-3">
-                                    Benvenuto<span className="text-copper">.</span>
-                                </h2>
-                                <p className="text-text-secondary mb-6">Accedi per esplorare la tua collezione.</p>
-                                <Link
-                                    href="/login"
-                                    onClick={closeMenu}
-                                    className="group inline-flex items-center gap-3 px-6 py-4 bg-text-primary text-text-inverted hover:bg-copper transition-colors"
-                                >
-                                    <span className="text-xs font-medium uppercase tracking-widest">Accedi</span>
-                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                </Link>
-                            </div>
-                        )}
+                                    <Search className="h-4 w-4" />
+                                </button>
+                            </form>
+                        </div>
 
-                        {/* NAVIGATION - PROMINENT */}
-                        <nav className="px-6 py-6">
-                            <div className="space-y-0">
-                                {[{ label: "Home", href: "/" }, ...navItems].map((item, index) => {
+                        <nav className="px-6 py-6 border-b border-border-primary">
+                            <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-4">Navigazione</p>
+                            <div className="space-y-2">
+                                {[
+                                    { label: "Home", href: "/", icon: Home },
+                                    { label: "Esplora", href: "/explore", icon: Compass },
+                                    { label: "Brand", href: "/brands", icon: Building2 },
+                                    { label: "Community", href: "/community", icon: Users },
+                                ].map((item) => {
                                     const isActive = pathname === item.href;
+                                    const Icon = item.icon;
                                     return (
                                         <Link
                                             key={item.href}
                                             href={item.href}
                                             onClick={closeMenu}
                                             className={cn(
-                                                "group flex items-center justify-between py-5 border-b border-border-secondary/30 transition-colors",
-                                                isActive ? "border-copper" : "hover:border-copper"
+                                                "flex items-center justify-between border border-border-secondary/40 px-4 py-4 transition-colors",
+                                                isActive
+                                                    ? "border-copper bg-copper/5"
+                                                    : "hover:border-copper"
                                             )}
                                         >
-                                            <div className="flex items-baseline gap-4">
-                                                <span className={cn(
-                                                    "text-xs font-mono",
-                                                    isActive ? "text-copper" : "text-text-muted"
-                                                )}>
-                                                    0{index + 1}
-                                                </span>
-                                                <span className={cn(
-                                                    "font-serif text-3xl transition-colors",
-                                                    isActive ? "text-copper" : "text-text-primary group-hover:text-copper"
-                                                )}>
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-copper" : "text-text-muted")} />
+                                                <span className={cn("font-serif text-2xl truncate", isActive ? "text-copper" : "text-text-primary")}>
                                                     {item.label}
                                                 </span>
                                             </div>
-                                            <ArrowUpRight className={cn(
-                                                "h-5 w-5 transition-all",
-                                                isActive
-                                                    ? "text-copper opacity-100"
-                                                    : "text-text-muted opacity-0 group-hover:opacity-100 group-hover:text-copper"
-                                            )} />
+                                            <ArrowRight className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "text-copper" : "text-text-muted")} />
                                         </Link>
                                     );
                                 })}
                             </div>
                         </nav>
-                    </div>
 
-                    {/* Footer - MINIMAL */}
-                    <div className="border-t border-border-primary bg-bg-secondary/20">
-                        {/* Search - Compact */}
-                        <div className="px-6 py-3 border-b border-border-secondary/30">
-                            <form onSubmit={handleMobileSearch} className="relative">
-                                <input
-                                    type="text"
-                                    value={mobileSearchQuery}
-                                    onChange={(e) => setMobileSearchQuery(e.target.value)}
-                                    placeholder="Cerca..."
-                                    className="w-full bg-transparent border-none px-0 py-2 text-sm placeholder:text-text-muted outline-none"
-                                />
-                                <Search className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
-                            </form>
-                        </div>
-
-                        {/* Quick Actions - Very Small */}
-                        <div className="px-6 py-3 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
+                        <div className="px-6 py-6 border-b border-border-primary">
+                            <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-4">Azioni</p>
+                            <div className="grid grid-cols-2 gap-3">
                                 <Link
                                     href="/favorites"
                                     onClick={closeMenu}
-                                    className="text-text-muted hover:text-copper transition-colors"
-                                    aria-label="Preferiti"
+                                    className="border border-border-secondary/40 px-4 py-4 hover:border-copper transition-colors"
                                 >
-                                    <Heart className="h-4 w-4" />
+                                    <div className="flex items-center gap-2 text-text-muted">
+                                        <Heart className="h-4 w-4" />
+                                        <span className="text-[10px] font-mono uppercase tracking-widest">Preferiti</span>
+                                    </div>
+                                    <p className="mt-3 font-serif text-xl">Salvati</p>
                                 </Link>
+
                                 <button
-                                    onClick={() => { closeMenu(); surpriseMe(); }}
-                                    className="text-text-muted hover:text-gold transition-colors"
-                                    aria-label="Random"
+                                    onClick={() => {
+                                        closeMenu();
+                                        surpriseMe();
+                                    }}
+                                    className="border border-border-secondary/40 px-4 py-4 hover:border-gold transition-colors text-left"
                                 >
-                                    <Sparkles className="h-4 w-4" />
+                                    <div className="flex items-center gap-2 text-text-muted">
+                                        <Sparkles className="h-4 w-4" />
+                                        <span className="text-[10px] font-mono uppercase tracking-widest">Sorprendimi</span>
+                                    </div>
+                                    <p className="mt-3 font-serif text-xl">Random</p>
                                 </button>
-                                <ThemeToggle />
                             </div>
+                        </div>
+
+                        <div className="px-6 py-6">
+                            <p className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-4">Account</p>
+                            {user ? (
+                                <div className="space-y-3">
+                                    <Link
+                                        href="/profile"
+                                        onClick={closeMenu}
+                                        className="border border-border-secondary/40 px-4 py-4 hover:border-copper transition-colors"
+                                    >
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="min-w-0">
+                                                <p className="font-serif text-2xl truncate">{username}</p>
+                                                <p className="mt-1 text-sm text-text-muted truncate">{user.email}</p>
+                                            </div>
+                                            <UserIcon className="h-4 w-4 text-text-muted shrink-0 mt-1" />
+                                        </div>
+                                    </Link>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <Link
+                                            href="/settings"
+                                            onClick={closeMenu}
+                                            className="border border-border-secondary/40 px-4 py-4 hover:border-copper transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2 text-text-muted">
+                                                <Settings className="h-4 w-4" />
+                                                <span className="text-[10px] font-mono uppercase tracking-widest">Impostazioni</span>
+                                            </div>
+                                        </Link>
+                                        <form action={signout}>
+                                            <button
+                                                type="submit"
+                                                className="w-full border border-red-500/20 px-4 py-4 hover:border-red-500/50 transition-colors text-left"
+                                            >
+                                                <div className="flex items-center gap-2 text-red-500/80">
+                                                    <LogOut className="h-4 w-4" />
+                                                    <span className="text-[10px] font-mono uppercase tracking-widest">Esci</span>
+                                                </div>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="border border-border-secondary/40 px-4 py-4 bg-bg-secondary/20">
+                                        <p className="font-serif text-2xl">Benvenuto<span className="text-copper">.</span></p>
+                                        <p className="mt-1 text-sm text-text-secondary">Accedi per salvare e recensire.</p>
+                                    </div>
+                                    <Link
+                                        href="/login"
+                                        onClick={closeMenu}
+                                        className="w-full inline-flex items-center justify-between px-5 py-4 bg-text-primary text-text-inverted hover:bg-copper transition-colors"
+                                    >
+                                        <span className="text-xs font-medium uppercase tracking-widest">Accedi</span>
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

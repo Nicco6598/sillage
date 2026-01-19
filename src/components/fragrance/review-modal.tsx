@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState, useEffect, useCallback, useSyncExternalStore } from "react";
 import { submitReview, updateReview, type ReviewState } from "@/app/actions/submit-review";
 import { Star, X, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,41 +44,20 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
     );
     const state = stateRaw as ReviewState;
 
-    const [rating, setRating] = useState([0]);
-    const [manualInput, setManualInput] = useState("");
-    const [valSillage, setValSillage] = useState([3.0]);
-    const [valLongevity, setValLongevity] = useState([3.0]);
-    const [comment, setComment] = useState("");
-    const [genderVote, setGenderVote] = useState<string>("");
-    const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
-    const [batchCode, setBatchCode] = useState("");
-    const [productionDate, setProductionDate] = useState("");
-
-    // Pre-fill form when editing an existing review
-    useEffect(() => {
-        if (isOpen && editingReview) {
-            const ratingVal = Number(editingReview.rating) || 0;
-            setRating([ratingVal]);
-            setManualInput(ratingVal > 0 ? ratingVal.toFixed(2) : "");
-            setValSillage([Number(editingReview.sillage) || 3.0]);
-            setValLongevity([Number(editingReview.longevity) || 3.0]);
-            setComment(editingReview.comment || "");
-            setGenderVote(editingReview.genderVote || "");
-            setSelectedSeasons(editingReview.seasonVote ? editingReview.seasonVote.split(",") : []);
-            setBatchCode(editingReview.batchCode || "");
-            setProductionDate(editingReview.productionDate || "");
-        } else if (!isOpen) {
-            setRating([0]);
-            setManualInput("");
-            setValSillage([3.0]);
-            setValLongevity([3.0]);
-            setComment("");
-            setGenderVote("");
-            setSelectedSeasons([]);
-            setBatchCode("");
-            setProductionDate("");
-        }
-    }, [isOpen, editingReview]);
+    const [rating, setRating] = useState(() => [Number(editingReview?.rating) || 0]);
+    const [manualInput, setManualInput] = useState(() => {
+        const ratingVal = Number(editingReview?.rating) || 0;
+        return ratingVal > 0 ? ratingVal.toFixed(2) : "";
+    });
+    const [valSillage, setValSillage] = useState(() => [Number(editingReview?.sillage) || 3.0]);
+    const [valLongevity, setValLongevity] = useState(() => [Number(editingReview?.longevity) || 3.0]);
+    const [comment, setComment] = useState(() => editingReview?.comment || "");
+    const [genderVote, setGenderVote] = useState<string>(() => editingReview?.genderVote || "");
+    const [selectedSeasons, setSelectedSeasons] = useState<string[]>(() =>
+        editingReview?.seasonVote ? editingReview.seasonVote.split(",") : []
+    );
+    const [batchCode, setBatchCode] = useState(() => editingReview?.batchCode || "");
+    const [productionDate, setProductionDate] = useState(() => editingReview?.productionDate || "");
     useEffect(() => {
         if (state.success) {
             const t = setTimeout(() => {
@@ -88,47 +67,28 @@ export function ReviewModal({ isOpen, onClose, fragranceId, fragranceSlug, fragr
         }
     }, [state.success, onClose]);
 
-    const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (state.resetTimestamp && !state.success) {
-            const updateCountdown = () => {
-                const now = Date.now();
-                const diff = state.resetTimestamp! - now;
-
-                if (diff <= 0) {
-                    setTimeRemaining(null);
-                    return;
-                }
-
-                const totalSeconds = Math.floor(diff / 1000);
-                const totalMinutes = Math.floor(totalSeconds / 60);
-                const seconds = totalSeconds % 60;
-                const hours = Math.floor(totalMinutes / 60);
-                const minutes = totalMinutes % 60;
-
-                let formatted = "";
-                if (hours > 0) {
-                    formatted = `${hours} or${hours === 1 ? "a" : "e"}`;
-                    if (minutes > 0) formatted += ` e ${minutes} minut${minutes === 1 ? "o" : "i"}`;
-                } else if (minutes > 0) {
-                    formatted = `${minutes} minut${minutes === 1 ? "o" : "i"}`;
-                    if (seconds > 0 && minutes < 5) formatted += ` e ${seconds} second${seconds === 1 ? "o" : "i"}`;
-                } else {
-                    formatted = `${seconds} second${seconds === 1 ? "o" : "i"}`;
-                }
-
-                setTimeRemaining(formatted);
-            };
-
-            updateCountdown();
-            const interval = setInterval(updateCountdown, 1000);
-
+    const subscribeCountdown = useCallback(
+        (onStoreChange: () => void) => {
+            if (!state.resetTimestamp || state.success) {
+                return () => { };
+            }
+            const interval = setInterval(onStoreChange, 1000);
             return () => clearInterval(interval);
-        } else {
-            setTimeRemaining(null);
-        }
+        },
+        [state.resetTimestamp, state.success]
+    );
+
+    const getTimeSnapshot = useCallback(() => {
+        if (!state.resetTimestamp || state.success) return null;
+        const diff = state.resetTimestamp - Date.now();
+        return formatTimeRemaining(diff);
     }, [state.resetTimestamp, state.success]);
+
+    const timeRemaining = useSyncExternalStore(
+        subscribeCountdown,
+        getTimeSnapshot,
+        () => null
+    );
 
     const handleManualChange = (val: string) => {
         setManualInput(val);
@@ -467,4 +427,27 @@ function DetailedSlider({ name, value, onChange, step = 0.1 }: { name: string, v
             </div>
         </div>
     );
+}
+
+function formatTimeRemaining(diff: number): string | null {
+    if (diff <= 0) return null;
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    let formatted = "";
+    if (hours > 0) {
+        formatted = `${hours} or${hours === 1 ? "a" : "e"}`;
+        if (minutes > 0) formatted += ` e ${minutes} minut${minutes === 1 ? "o" : "i"}`;
+    } else if (minutes > 0) {
+        formatted = `${minutes} minut${minutes === 1 ? "o" : "i"}`;
+        if (seconds > 0 && minutes < 5) formatted += ` e ${seconds} second${seconds === 1 ? "o" : "i"}`;
+    } else {
+        formatted = `${seconds} second${seconds === 1 ? "o" : "i"}`;
+    }
+
+    return formatted;
 }

@@ -52,7 +52,7 @@ export function CollectionActions({ fragranceId }: CollectionActionsProps) {
                     title: document.title,
                     url: window.location.href,
                 });
-            } catch (_e) {
+            } catch {
                 // User cancelled or error
             }
         } else {

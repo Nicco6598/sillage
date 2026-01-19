@@ -7,14 +7,14 @@ import { ArrowUp, ArrowUpRight, Mail } from "lucide-react";
 const footerLinks = {
     Esplora: [
         { label: "Tutte le Fragranze", href: "/explore" },
-        { label: "Brands", href: "/brands" },
+        { label: "Brand", href: "/brands" },
         { label: "Novità", href: "/explore?sort=newest" },
     ],
     Risorse: [
-        { label: "Chi Siamo", href: "/about" },
-        { label: "FAQ", href: "/faq" },
-        { label: "Contatti", href: "/contact" },
-        { label: "Blog", href: "/blog" },
+        { label: "Community", href: "/community" },
+        { label: "Preferiti", href: "/favorites" },
+        { label: "Profilo", href: "/profile" },
+        { label: "Impostazioni", href: "/settings" },
     ],
     Legal: [
         { label: "Privacy", href: "/privacy" },

@@ -5,10 +5,10 @@ import { Heart, Grid, List, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 const mockFavorites = [
-    { id: "1", name: "Bleu de Chanel", brand: "Chanel", rating: 4.8 },
-    { id: "2", name: "Sauvage", brand: "Dior", rating: 4.6 },
-    { id: "3", name: "Aventus", brand: "Creed", rating: 4.9 },
-    { id: "4", name: "Tobacco Vanille", brand: "Tom Ford", rating: 4.7 },
+    { id: "1", name: "Bleu de Chanel", brand: "Chanel", rating: 4.8, slug: "bleu-de-chanel" },
+    { id: "2", name: "Sauvage", brand: "Dior", rating: 4.6, slug: "sauvage" },
+    { id: "3", name: "Aventus", brand: "Creed", rating: 4.9, slug: "aventus" },
+    { id: "4", name: "Tobacco Vanille", brand: "Tom Ford", rating: 4.7, slug: "tobacco-vanille" },
 ];
 
 export default function FavoritesPage() {
@@ -61,7 +61,7 @@ export default function FavoritesPage() {
                                 </div>
                                 <h3 className="text-lg font-medium group-hover:underline underline-offset-4 decoration-1">{f.name}</h3>
                                 <p className="text-sm text-text-muted uppercase tracking-wider mb-2">{f.brand}</p>
-                                <Link href={`/fragrance/${f.id}`} className="text-xs font-mono uppercase tracking-widest border-b border-transparent group-hover:border-text-primary transition-colors inline-block pb-0.5">
+                                <Link href={`/fragrance/${f.slug}`} className="text-xs font-mono uppercase tracking-widest border-b border-transparent group-hover:border-text-primary transition-colors inline-block pb-0.5">
                                     Visualizza
                                 </Link>
                             </div>
@@ -80,7 +80,7 @@ export default function FavoritesPage() {
                                 </div>
                                 <div className="flex items-center gap-8">
                                     <span className="font-mono text-sm hidden sm:block">★ {f.rating}</span>
-                                    <Link href={`/fragrance/${f.id}`} className="group-hover:translate-x-2 transition-transform duration-300">
+                                    <Link href={`/fragrance/${f.slug}`} className="group-hover:translate-x-2 transition-transform duration-300">
                                         <ArrowRight className="h-5 w-5 text-text-primary" />
                                     </Link>
                                 </div>

@@ -42,7 +42,7 @@ function containsForbiddenWords(text: string): boolean {
     return FORBIDDEN_WORDS.some(word => lowerText.includes(word));
 }
 
-export async function submitReview(prevState: ReviewState, formData: FormData) {
+export async function submitReview(_prevState: ReviewState, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -144,7 +144,7 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
 }
 
 // Update an existing review
-export async function updateReview(prevState: ReviewState, formData: FormData) {
+export async function updateReview(_prevState: ReviewState, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -153,7 +153,6 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
     }
 
     const reviewId = formData.get("reviewId") as string;
-    const slug = formData.get("slug") as string;
 
     // Verify ownership
     const [existingReview] = await db
@@ -166,6 +165,8 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
         return { success: false, message: "Non puoi modificare questa recensione." };
     }
 
+    const slugValue = formData.get("slug") as string | null;
+
     const rawData = {
         fragranceId: formData.get("fragranceId"),
         rating: Number(formData.get("rating")),
@@ -176,7 +177,7 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
         seasonVote: formData.get("seasonVote") || undefined,
         batchCode: formData.get("batchCode") || undefined,
         productionDate: formData.get("productionDate") || undefined,
-        slug
+        slug: slugValue ?? undefined
     };
 
     const formFields = ReviewSchema.safeParse(rawData);
@@ -208,7 +209,7 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
         }
     }
 
-    const { slug: _slug, ...rawDataForDb } = formFields.data;
+    const { slug, ...rawDataForDb } = formFields.data;
 
 
     const dbData = {

@@ -59,14 +59,17 @@ export function ReviewsList({ reviews, currentUserId, fragranceId, fragranceSlug
             </div>
 
             {/* Edit Modal */}
-            <ReviewModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                fragranceId={fragranceId}
-                fragranceSlug={fragranceSlug}
-                fragranceName={fragranceName}
-                editingReview={editingReview}
-            />
+            {isModalOpen && (
+                <ReviewModal
+                    key={editingReview?.id ?? "new"}
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    fragranceId={fragranceId}
+                    fragranceSlug={fragranceSlug}
+                    fragranceName={fragranceName}
+                    editingReview={editingReview}
+                />
+            )}
         </>
     );
 }
