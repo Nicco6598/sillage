@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Fix for Turbopack workspace root warning
+  experimental: {
+    turbo: {
+      root: ".",
+    },
+  },
 };
 
 export default nextConfig;
