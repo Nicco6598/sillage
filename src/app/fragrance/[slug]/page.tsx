@@ -316,7 +316,6 @@ export default async function FragrancePage({ params }: FragrancePageProps) {
                     />
                 </div>
 
-                {/* REVIEWS SECTION */}
                 <div className="mt-24 mb-32">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-6 border-b border-border-primary">
                         <div className="flex items-center gap-4">

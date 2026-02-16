@@ -1,58 +1,54 @@
 # Sillage
 
-**Sillage** è il nuovo punto di riferimento digitale per la profumeria artistica in Italia. Una piattaforma premium progettata per esplorare, recensire e collezionare fragranze, unendo un'estetica curata a prestazioni tecnologiche d'avanguardia.
+**Sillage** è la piattaforma premium per la profumeria artistica in Italia: esplorazione, recensioni e collezione di fragranze con un'esperienza digitale curata e performance di livello enterprise.
 
-## 🚀 Visione & Stack Tecnologico
+## 🥇 Top 3 — Valore del prodotto
 
-Il progetto nasce con l'obiettivo di "umanizzare" la tecnologia, mettendola al servizio di un'arte sensoriale. Per farlo, abbiamo scelto uno stack moderno e orientato alle performance:
+1. **Mappa olfattiva completa:** ricerca avanzata per brand, note e piramidi per scoprire e confrontare fragranze con precisione.
+2. **Community affidabile:** recensioni protette da moderazione AI per mantenere un tono costruttivo e informazioni di qualità.
+3. **Esperienza premium:** interfaccia glassmorphic, micro-interazioni fluide e feedback visivo di alto profilo.
 
-- **Framework:** Next.js 16 (App Router)
-- **Database:** Supabase (PostgreSQL)
-- **ORM:** Drizzle ORM
-- **Styling:** Tailwind CSS + Motion (per micro-interazioni premium)
-- **AI:** Google Gemini (per la moderazione intelligente dei contenuti)
-- **Infrastructure:** Upstash (Redis & Rate-limiting)
+## 🥈 Top 3 — Scelte tecniche che contano
 
----
+1. **Stack moderno e performante:** Next.js 16 (App Router), Supabase (PostgreSQL), Drizzle ORM, Tailwind CSS + Motion.
+2. **Type-safety end‑to‑end:** schema e tipi allineati con Drizzle per ridurre errori e accelerare lo sviluppo.
+3. **Architettura essenziale:** Server Actions per eliminare boilerplate API, validazione unificata con Zod e readiness per ambienti Edge.
 
-## 🏛️ Decisioni Architetturali
+## 🔬 Dettagli tecnici
 
-In Sillage, ogni scelta tecnica è stata guidata dalla ricerca dell'equilibrio tra **Performance**, **Type-Safety** e **Developer Experience**.
+- **Struttura applicativa:** App Router con rendering ibrido, pagine server-first e componenti client per interazioni dinamiche.
+- **Persistenza dati:** Supabase Postgres con schema tipizzato via Drizzle, query composabili e migrazioni versionate.
+- **Flussi core:** esplorazione catalogo, scheda fragranza, collezione personale, recensioni con moderazione, discovery.
+- **UI/UX:** design system minimale in Tailwind, motion per micro‑interazioni e feedback di stato chiari.
+- **Performance:** query snelle, componenti modulari, asset ottimizzati e attenzione ai tempi di caricamento.
+- **Affidabilità:** rate‑limiting con Upstash, validazioni Zod e controllo contenuti assistito da AI.
 
-### 🛠️ Perché Drizzle ORM?
-Abbiamo preferito **Drizzle** rispetto a alternative più massicce (come Prisma) per diversi motivi:
-1.  **Zero Overhead:** Drizzle non ha una "runtime" pesante. Ciò che scrivi è molto vicino all'SQL puro, garantendo query fulminee.
-2.  **Type-Safety Nativa:** Essendo "TypeScript-first", Drizzle ci permette di avere una sincronizzazione perfetta tra lo schema del database e i tipi del frontend, riducendo drasticamente i bug in produzione.
-3.  **Edge-Ready:** La sua leggerezza ci permette di eseguire il codice su infrastrutture Edge senza compromettere i tempi di "cold start".
+## 🧩 Moduli principali
 
-### ⚡ Perché Server Actions?
-Invece di costruire una REST API tradizionale, abbiamo adottato le **Next.js Server Actions** per gestire le interazioni (come l'invio di recensioni o la gestione del profilo):
-1.  **Seamless Integration:** Le azioni server eliminano la necessità di gestire endpoint API manuali e fetch complessi nel client.
-2.  **Unified Validation:** Utilizziamo Zod per validare i dati una sola volta, sia nel client che nel server, garantendo coerenza e sicurezza.
-3.  **Progressive Enhancement:** Le Server Actions permettono alla piattaforma di mantenere funzionalità di base anche in scenari con connettività limitata, migliorando l'accessibilità complessiva.
+- **Explore:** filtri multi‑criterio e ricerca per note/brand/accordi.
+- **Fragrance Detail:** scheda completa con voti community e insight olfattivi.
+- **Collection & Favorites:** gestione stato collezione e preferiti con azioni atomiche.
+- **Reviews:** CRUD con moderazione e protezioni anti‑abuso.
+- **Auth & Profile:** registrazione, login e gestione profilo con Supabase.
 
----
+## ⚙️ Scripts
 
-## ✨ Funzionalità Chiave
+- `pnpm dev` avvia il server di sviluppo
+- `pnpm build` compila la build di produzione
+- `pnpm start` avvia la build
+- `pnpm lint` esegue ESLint
 
-- **Database Olfattivo:** Navigazione avanzata per brand, note e piramidi olfattive.
-- **AI Moderation:** Sistema di recensioni protetto da AI per mantenere un tono costruttivo e rispettoso nella community.
-- **Security First:** Protezione anti-spam avanzata con validazione email e rate-limiting granulare.
-- **Design 3D & Depth:** Un'interfaccia "glassmorphic" con ombre morbide e gradienti studiati per un feedback visivo di alto profilo.
+## 🥉 Top 3 — Affidabilità & Operatività
 
-## 🛠️ Sviluppo Locale
-
-1.  Clona il repository.
-2.  Installa le dipendenze:
-    ```bash
-    pnpm install
-    ```
-3.  Configura le variabili d'ambiente nel file `.env.local` (Supabase, Gemini API, Upstash).
-4.  Avvia il server di sviluppo:
-    ```bash
-    pnpm dev
-    ```
-
----
-
-Creato con passione per la community olfattiva italiana.
+1. **Security first:** rate‑limiting con Upstash, validazioni robuste e protezioni anti‑spam.
+2. **Moderazione intelligente:** Google Gemini per filtrare contenuti problematici e proteggere la qualità della community.
+3. **Setup in 3 passi:**
+   1. Installa le dipendenze:
+      ```bash
+      pnpm install
+      ```
+   2. Configura `.env.local` (Supabase, Gemini API, Upstash).
+   3. Avvia lo sviluppo:
+      ```bash
+      pnpm dev
+      ```

@@ -111,7 +111,6 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                                 </div>
                             </div>
 
-                            {/* Badges */}
                             {fragrance.isNew && (
                                 <span className="absolute left-4 top-4 rounded-lg bg-accent px-3 py-1 text-sm font-medium text-white shadow-lg">
                                     🆕 Nuovo
@@ -119,7 +118,6 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                             )}
                         </div>
 
-                        {/* Quick Actions */}
                         <div className="mt-4 flex gap-2">
                             <button
                                 onClick={() => setIsLiked(!isLiked)}
@@ -179,7 +177,6 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                         )}
                     </div>
 
-                    {/* Rating Card */}
                     <div className="rounded-2xl border border-border-primary bg-bg-secondary p-5">
                         <div className="flex items-center justify-between">
                             <div>
@@ -211,7 +208,6 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                             </div>
                         </div>
 
-                        {/* Stats Bars */}
                         <div className="mt-6 grid grid-cols-2 gap-4">
                             <div>
                                 <div className="flex items-center justify-between text-sm">
@@ -403,10 +399,8 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                         </div>
                     )}
 
-                    {/* Reviews Tab */}
                     {activeTab === "reviews" && (
                         <div className="space-y-4">
-                            {/* Write Review CTA */}
                             <div className="rounded-2xl border border-accent/30 bg-accent/5 p-6 text-center">
                                 <MessageCircle className="mx-auto h-8 w-8 text-accent" />
                                 <h3 className="mt-3 text-lg font-semibold text-text-primary">
@@ -420,7 +414,6 @@ export function FragranceDetail({ fragrance, similar }: FragranceDetailProps) {
                                 </button>
                             </div>
 
-                            {/* Reviews List */}
                             <div className="space-y-4">
                                 {mockReviews.map((review) => (
                                     <div

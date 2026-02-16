@@ -31,9 +31,6 @@ const navItems: NavItem[] = [
     { label: "Community", href: "/community" },
 ];
 
-/**
- * Navbar - Stone & Silk Design System
- */
 export function Navbar() {
     const router = useRouter();
     const pathname = usePathname();
@@ -221,7 +218,6 @@ export function Navbar() {
                 </div>
             </header>
 
-            {/* Mobile Menu - Stone & Silk Style */}
             <div
                 className={cn(
                     "fixed inset-0 z-[100] lg:hidden transition-opacity duration-300",

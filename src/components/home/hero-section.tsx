@@ -35,12 +35,10 @@ export function HeroSection() {
                     Esplora migliaia di fragranze, leggi recensioni e scopri la tua signature scent.
                 </p>
 
-                {/* Search Bar */}
                 <div className="mt-10 w-full max-w-xl">
                     <SearchBar />
                 </div>
 
-                {/* Quick Tags */}
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
                     <span className="text-sm text-text-muted">Popolari:</span>
                     {["Bleu de Chanel", "Sauvage", "Aventus"].map((name) => (
