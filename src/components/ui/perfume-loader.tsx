@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 /**
  * PerfumeLoader - An elegant loading animation matching the Sillage "Stone & Silk" design
@@ -64,60 +65,72 @@ export function InlineLoader({ message = "Caricamento" }: InlineLoaderProps) {
  */
 export function RouteChangeLoader() {
     const [isLoading, setIsLoading] = useState(false);
+    const [pendingKey, setPendingKey] = useState<string | null>(null);
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentKey = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+    const lastKeyRef = useRef(currentKey);
 
     useEffect(() => {
-        // Listen for route change start
-        const handleComplete = () => {
-            // Small delay for smooth transition
-            setTimeout(() => setIsLoading(false), 300);
-        };
+        lastKeyRef.current = currentKey;
+    }, [currentKey]);
 
-        // For Next.js App Router, we need to intercept link clicks
+    useEffect(() => {
         const handleClick = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
             const anchor = target.closest("a");
 
             if (anchor && anchor.href) {
                 const url = new URL(anchor.href, window.location.origin);
+                const destination = `${url.pathname}${url.search}`;
+                const current = `${window.location.pathname}${window.location.search}`;
 
-                // Only show loader for internal navigation
                 if (
                     url.origin === window.location.origin &&
-                    url.pathname !== window.location.pathname &&
+                    destination !== current &&
                     !anchor.target &&
                     !anchor.download &&
                     !e.ctrlKey &&
                     !e.metaKey &&
                     !e.shiftKey
                 ) {
+                    setPendingKey(current);
                     setIsLoading(true);
                 }
             }
         };
 
+        const handlePopState = () => {
+            setPendingKey(lastKeyRef.current);
+            setIsLoading(true);
+        };
+
         document.addEventListener("click", handleClick);
-
-        // Hide loader when page loads
-        window.addEventListener("load", handleComplete);
-
-        // Also listen for popstate (back/forward navigation)
-        window.addEventListener("popstate", () => setIsLoading(true));
+        window.addEventListener("popstate", handlePopState);
 
         return () => {
             document.removeEventListener("click", handleClick);
-            window.removeEventListener("load", handleComplete);
+            window.removeEventListener("popstate", handlePopState);
         };
     }, []);
 
-    // Hide loader after navigation completes
     useEffect(() => {
-        if (isLoading) {
-            const timer = setTimeout(() => {
-                setIsLoading(false);
-            }, 2000); // Fallback timeout
+        if (!isLoading || !pendingKey) return;
+        if (currentKey === pendingKey) return;
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+            setPendingKey(null);
+        }, 250);
+        return () => clearTimeout(timer);
+    }, [currentKey, isLoading, pendingKey]);
 
-            return () => clearTimeout(timer);
-        }
+    useEffect(() => {
+        if (!isLoading) return;
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+            setPendingKey(null);
+        }, 5000);
+        return () => clearTimeout(timer);
     }, [isLoading]);
 
     if (!isLoading) return null;

@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useCallback, useTransition, useEffect } from "react";
-import { Search, SlidersHorizontal, X, Check, ChevronLeft, ChevronRight, Star, ArrowUpRight } from "lucide-react";
+import { Search, SlidersHorizontal, X, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Fragrance } from "@/types/fragrance";
 import { cn } from "@/lib/utils";
 import { FragranceCard } from "@/components/fragrance/fragrance-card";
@@ -62,17 +61,6 @@ export function ExploreContent({
     const [priceRange, setPriceRange] = useState([0, 600]);
     const [searchValue, setSearchValue] = useState(query);
 
-    // Sync local filters with URL params when they change externally
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLocalFilters({
-            gender: currentFilters.gender ?? "",
-            brand: currentFilters.brand ?? "",
-            note: currentFilters.note ?? "",
-            accord: currentFilters.accord ?? "",
-        });
-    }, [currentFilters]);
-
     // Debounced live search - triggers search as user types
     useEffect(() => {
         // Skip if the search value matches the current query (e.g., initial load)
@@ -109,6 +97,16 @@ export function ExploreContent({
             router.push(`/explore?${params.toString()}`);
         });
     }, [searchValue, searchParams, router]);
+
+    const openFilters = useCallback(() => {
+        setLocalFilters({
+            gender: currentFilters.gender ?? "",
+            brand: currentFilters.brand ?? "",
+            note: currentFilters.note ?? "",
+            accord: currentFilters.accord ?? "",
+        });
+        setIsFilterOpen(true);
+    }, [currentFilters]);
 
     // Apply filters
     const applyFilters = useCallback(() => {
@@ -189,7 +187,7 @@ export function ExploreContent({
 
                 {/* Filter Button */}
                 <button
-                    onClick={() => setIsFilterOpen(true)}
+                    onClick={openFilters}
                     className={cn(
                         "flex items-center justify-center gap-2 px-5 py-3 text-sm uppercase tracking-widest border transition-all duration-300",
                         activeFilterCount > 0

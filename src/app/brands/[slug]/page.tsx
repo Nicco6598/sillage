@@ -1,10 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, ArrowUpRight, Star } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getBrandBySlug, getFragrancesByBrand } from "@/lib/fragrance-db";
 import { FragranceCard } from "@/components/fragrance/fragrance-card";
-import type { Fragrance } from "@/types/fragrance";
 
 interface BrandPageProps {
     params: Promise<{ slug: string }>;

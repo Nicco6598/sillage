@@ -48,7 +48,7 @@ export function BrandsClientPage({ allBrands, featuredBrands, stats }: BrandsCli
         return groups;
     }, [filteredBrands]);
 
-    const sortedLetters = Object.keys(groupedBrands).sort();
+    const sortedLetters = useMemo(() => Object.keys(groupedBrands).sort(), [groupedBrands]);
 
     return (
         <div className="w-full pt-32 md:pt-40 pb-24">
@@ -68,7 +68,7 @@ export function BrandsClientPage({ allBrands, featuredBrands, stats }: BrandsCli
 
                             {/* Search Input */}
                             <div className="relative w-full md:w-80">
-                                <div className="absolute inset-0 bg-bg-tertiary/50 backdrop-blur-sm -z-10 border border-border-primary" />
+                                <div className="absolute inset-0 bg-bg-tertiary/50 -z-10 border border-border-primary" />
                                 <input
                                     type="text"
                                     value={searchQuery}
@@ -116,7 +116,7 @@ export function BrandsClientPage({ allBrands, featuredBrands, stats }: BrandsCli
                                 <Link
                                     key={brand.id}
                                     href={`/brands/${brand.slug}`}
-                                    className="group relative overflow-hidden border border-border-primary bg-bg-secondary/30 backdrop-blur-sm hover:border-copper transition-all duration-500"
+                                    className="group relative overflow-hidden border border-border-primary bg-bg-secondary/30 hover:border-copper transition-all duration-500"
                                 >
                                     {/* Gradient Overlay on Hover */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-copper/0 via-copper/0 to-copper/0 group-hover:from-copper/5 group-hover:via-copper/10 group-hover:to-rose-gold/5 transition-all duration-700" />
@@ -202,7 +202,11 @@ export function BrandsClientPage({ allBrands, featuredBrands, stats }: BrandsCli
                 {sortedLetters.length > 0 ? (
                     <div className="space-y-12">
                         {sortedLetters.map((letter) => (
-                            <div key={letter} id={`letter-${letter}`} className="scroll-mt-32">
+                            <div
+                                key={letter}
+                                id={`letter-${letter}`}
+                                className="scroll-mt-32 [content-visibility:auto] [contain-intrinsic-size:1px_420px]"
+                            >
                                 {/* Letter Header */}
                                 <div className="flex items-center gap-4 mb-6">
                                     <span className="font-serif text-5xl text-copper/30">

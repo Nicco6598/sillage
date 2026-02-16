@@ -21,13 +21,15 @@ export function ReviewAction({ fragranceId, fragranceSlug, fragranceName }: Revi
             >
                 Scrivi una recensione
             </button>
-            <ReviewModal
-                isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
-                fragranceId={fragranceId}
-                fragranceSlug={fragranceSlug}
-                fragranceName={fragranceName}
-            />
+            {isOpen && (
+                <ReviewModal
+                    isOpen={isOpen}
+                    onClose={() => setIsOpen(false)}
+                    fragranceId={fragranceId}
+                    fragranceSlug={fragranceSlug}
+                    fragranceName={fragranceName}
+                />
+            )}
         </>
     );
 }

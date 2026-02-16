@@ -1,9 +1,10 @@
 "use client";
 
 import { Search, X, Loader2 } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { cn, debounce } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface SearchSuggestion {
     id: string;
@@ -27,6 +28,7 @@ export function SearchBar({
     onSearch,
     className,
 }: SearchBarProps) {
+    const router = useRouter();
     const [query, setQuery] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -36,29 +38,30 @@ export function SearchBar({
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Fetch suggestions
-    const fetchSuggestions = useCallback(
-        debounce(async (searchQuery: string) => {
-            if (searchQuery.length < 2) {
-                setSuggestions([]);
-                setIsLoading(false);
-                return;
-            }
-
-            setIsLoading(true);
-            try {
-                const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    setSuggestions(data.suggestions);
+    const fetchSuggestions = useMemo(
+        () =>
+            debounce(async (searchQuery: string) => {
+                if (searchQuery.length < 2) {
+                    setSuggestions([]);
+                    setIsLoading(false);
+                    return;
                 }
-            } catch (error) {
-                console.error("Search error:", error);
-                setSuggestions([]);
-            } finally {
-                setIsLoading(false);
-            }
-        }, 300),
+
+                setIsLoading(true);
+                try {
+                    const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        setSuggestions(data.suggestions);
+                    }
+                } catch (error) {
+                    console.error("Search error:", error);
+                    setSuggestions([]);
+                } finally {
+                    setIsLoading(false);
+                }
+            }, 300),
         []
     );
 
@@ -84,8 +87,7 @@ export function SearchBar({
         if (query.trim()) {
             onSearch?.(query);
             setShowSuggestions(false);
-            // Navigate to search results
-            window.location.href = `/explore?q=${encodeURIComponent(query)}`;
+            router.push(`/explore?q=${encodeURIComponent(query)}`);
         }
     };
 
@@ -183,7 +185,7 @@ export function SearchBar({
                         <button
                             onClick={() => {
                                 setShowSuggestions(false);
-                                window.location.href = `/explore?q=${encodeURIComponent(query)}`;
+                                router.push(`/explore?q=${encodeURIComponent(query)}`);
                             }}
                             className="w-full rounded-lg py-2 text-center text-sm font-medium text-copper transition-colors hover:bg-copper/5"
                         >
