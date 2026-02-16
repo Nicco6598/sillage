@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sillage
 
-## Getting Started
+**Sillage** è la piattaforma premium per la profumeria artistica in Italia: esplorazione, recensioni e collezione di fragranze con un'esperienza digitale curata e performance di livello enterprise.
 
-First, run the development server:
+## 🥇 Top 3 — Valore del prodotto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Mappa olfattiva completa:** ricerca avanzata per brand, note e piramidi per scoprire e confrontare fragranze con precisione.
+2. **Community affidabile:** recensioni protette da moderazione AI per mantenere un tono costruttivo e informazioni di qualità.
+3. **Esperienza premium:** interfaccia glassmorphic, micro-interazioni fluide e feedback visivo di alto profilo.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🥈 Top 3 — Scelte tecniche che contano
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Stack moderno e performante:** Next.js 16 (App Router), Supabase (PostgreSQL), Drizzle ORM, Tailwind CSS + Motion.
+2. **Type-safety end‑to‑end:** schema e tipi allineati con Drizzle per ridurre errori e accelerare lo sviluppo.
+3. **Architettura essenziale:** Server Actions per eliminare boilerplate API, validazione unificata con Zod e readiness per ambienti Edge.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔬 Dettagli tecnici
 
-## Learn More
+- **Struttura applicativa:** App Router con rendering ibrido, pagine server-first e componenti client per interazioni dinamiche.
+- **Persistenza dati:** Supabase Postgres con schema tipizzato via Drizzle, query composabili e migrazioni versionate.
+- **Flussi core:** esplorazione catalogo, scheda fragranza, collezione personale, recensioni con moderazione, discovery.
+- **UI/UX:** design system minimale in Tailwind, motion per micro‑interazioni e feedback di stato chiari.
+- **Performance:** query snelle, componenti modulari, asset ottimizzati e attenzione ai tempi di caricamento.
+- **Affidabilità:** rate‑limiting con Upstash, validazioni Zod e controllo contenuti assistito da AI.
 
-To learn more about Next.js, take a look at the following resources:
+## 🧩 Moduli principali
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Explore:** filtri multi‑criterio e ricerca per note/brand/accordi.
+- **Fragrance Detail:** scheda completa con voti community e insight olfattivi.
+- **Collection & Favorites:** gestione stato collezione e preferiti con azioni atomiche.
+- **Reviews:** CRUD con moderazione e protezioni anti‑abuso.
+- **Auth & Profile:** registrazione, login e gestione profilo con Supabase.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ⚙️ Scripts
 
-## Deploy on Vercel
+- `pnpm dev` avvia il server di sviluppo
+- `pnpm build` compila la build di produzione
+- `pnpm start` avvia la build
+- `pnpm lint` esegue ESLint
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🥉 Top 3 — Affidabilità & Operatività
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Security first:** rate‑limiting con Upstash, validazioni robuste e protezioni anti‑spam.
+2. **Moderazione intelligente:** Google Gemini per filtrare contenuti problematici e proteggere la qualità della community.
+3. **Setup in 3 passi:**
+   1. Installa le dipendenze:
+      ```bash
+      pnpm install
+      ```
+   2. Configura `.env.local` (Supabase, Gemini API, Upstash).
+   3. Avvia lo sviluppo:
+      ```bash
+      pnpm dev
+      ```
