@@ -1,11 +1,8 @@
-/**
- * Email Validation & Normalization
- * Prevents duplicate accounts and blocks disposable emails
- */
+// Email normalization and disposable domain blocking
 
 import disposableDomains from "disposable-email-domains";
 
-// Additional commonly used disposable/temporary email domains
+
 const ADDITIONAL_DISPOSABLE_DOMAINS = [
     "tempmail.com",
     "guerrillamail.com",
@@ -19,18 +16,18 @@ const ADDITIONAL_DISPOSABLE_DOMAINS = [
     "getnada.com",
 ];
 
-// Create a Set for O(1) lookups
+
 const disposableDomainSet = new Set<string>([
     ...disposableDomains,
     ...ADDITIONAL_DISPOSABLE_DOMAINS,
 ]);
 
-/**
- * Normalize email address:
- * 1. Convert to lowercase
- * 2. Remove plus aliases (user+alias@gmail.com → user@gmail.com)
- * 3. For Gmail: remove dots (u.s.e.r@gmail.com → user@gmail.com)
- */
+const GOOGLE_DOMAINS = ["gmail.com", "googlemail.com"];
+
+function isGoogleEmail(domain: string): boolean {
+    return GOOGLE_DOMAINS.includes(domain);
+}
+
 export function normalizeEmail(email: string): string {
     const lowercased = email.toLowerCase().trim();
     const [localPart, domain] = lowercased.split("@");
@@ -39,21 +36,18 @@ export function normalizeEmail(email: string): string {
         return lowercased;
     }
 
-    // Remove plus alias (everything after +)
+    // Strip +alias suffix
     let normalizedLocal = localPart.split("+")[0];
 
-    // For Gmail and Google domains, also remove dots
-    const googleDomains = ["gmail.com", "googlemail.com"];
-    if (googleDomains.includes(domain)) {
+    // Gmail ignores dots in local part
+    if (isGoogleEmail(domain)) {
         normalizedLocal = normalizedLocal.replace(/\./g, "");
     }
 
     return `${normalizedLocal}@${domain}`;
 }
 
-/**
- * Check if email domain is a disposable/temporary email provider
- */
+
 export function isDisposableEmail(email: string): boolean {
     const domain = email.toLowerCase().split("@")[1];
 
@@ -61,12 +55,12 @@ export function isDisposableEmail(email: string): boolean {
         return false;
     }
 
-    // Check exact match
+
     if (disposableDomainSet.has(domain)) {
         return true;
     }
 
-    // Check for subdomains of known disposable domains
+    // Also check subdomains
     for (const disposable of disposableDomainSet) {
         if (domain.endsWith(`.${disposable}`)) {
             return true;
@@ -76,18 +70,15 @@ export function isDisposableEmail(email: string): boolean {
     return false;
 }
 
-/**
- * Validate email format and check if it's allowed
- * Returns error message if invalid, null if valid
- */
+
 export function validateEmail(email: string): string | null {
-    // Basic format check
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         return "Formato email non valido.";
     }
 
-    // Check for disposable email
+
     if (isDisposableEmail(email)) {
         return "Non è possibile registrarsi con email temporanee. Usa un indirizzo email permanente.";
     }
@@ -95,10 +86,7 @@ export function validateEmail(email: string): string | null {
     return null;
 }
 
-/**
- * Get the normalized email for database comparison
- * Use this to check for duplicate accounts
- */
+
 export function getEmailForDuplicateCheck(email: string): string {
     return normalizeEmail(email);
 }

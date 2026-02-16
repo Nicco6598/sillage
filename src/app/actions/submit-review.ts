@@ -27,25 +27,22 @@ export type ReviewState = {
     message?: string;
     errors?: Record<string, string[]>;
     success?: boolean;
+    resetTimestamp?: number; // Unix timestamp for rate limit reset
 }
 
-// Client-side forbidden words (basic filter before API call)
+// Basic profanity filter (runs before AI moderation)
 const FORBIDDEN_WORDS = [
     "merda", "cazzo", "minchia", "stronzo", "coglione", "puttana",
     "troia", "fottiti", "vaffanculo", "bastardo", "negro", "frocio"
 ];
 
-/**
- * Basic client-side profanity filter
- * This runs before the AI moderation to catch obvious violations quickly
- */
+
 function containsForbiddenWords(text: string): boolean {
     const lowerText = text.toLowerCase();
     return FORBIDDEN_WORDS.some(word => lowerText.includes(word));
 }
 
-export async function submitReview(prevState: ReviewState, formData: FormData) {
-    // Get the authenticated user
+export async function submitReview(_prevState: ReviewState, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -56,7 +53,7 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
         };
     }
 
-    // === RATE LIMITING (1 review per 5 minutes per user) ===
+    // Rate limiting: 1 review per 5 minutes
     try {
         const rateLimitResult = await checkReviewRateLimit(user.id);
 
@@ -64,12 +61,13 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
             const timeLeft = getTimeUntilReset(rateLimitResult.reset);
             return {
                 success: false,
-                message: `Puoi inviare una recensione ogni 5 minuti. Riprova tra ${timeLeft}.`
+                message: `Puoi inviare una recensione ogni 5 minuti. Riprova tra ${timeLeft}.`,
+                resetTimestamp: rateLimitResult.reset.getTime()
             };
         }
     } catch (error) {
         console.error("Review rate limit check error:", error);
-        // Continue on rate limit errors (fail open for UX)
+        // Continue if rate limit check fails (better UX)
     }
 
     const username = user.user_metadata?.username || user.email?.split('@')[0] || 'Utente';
@@ -87,28 +85,27 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
         slug: formData.get("slug")
     };
 
-    const validatedFields = ReviewSchema.safeParse(rawData);
+    const formFields = ReviewSchema.safeParse(rawData);
 
-    if (!validatedFields.success) {
+    if (!formFields.success) {
         return {
-            errors: validatedFields.error.flatten().fieldErrors,
+            errors: formFields.error.flatten().fieldErrors,
             message: "Controlla i campi inseriti.",
             success: false
         };
     }
 
-    // === CLIENT-SIDE PROFANITY FILTER (fast check) ===
-    if (validatedFields.data.comment && validatedFields.data.comment.trim().length > 0) {
-        // Quick local filter before AI moderation
-        if (containsForbiddenWords(validatedFields.data.comment)) {
+    // Quick profanity check before AI
+    if (formFields.data.comment && formFields.data.comment.trim().length > 0) {
+        if (containsForbiddenWords(formFields.data.comment)) {
             return {
                 success: false,
                 message: "Il contenuto contiene linguaggio volgare o offensivo."
             };
         }
 
-        // AI Moderation with Gemini
-        const moderationResult = await moderateContent(validatedFields.data.comment);
+        // AI moderation with Gemini
+        const moderationResult = await moderateContent(formFields.data.comment);
 
         if (moderationResult.flagged) {
             return {
@@ -118,9 +115,9 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
         }
     }
 
-    const { slug, ...rawDataForDb } = validatedFields.data;
+    const { slug, ...rawDataForDb } = formFields.data;
 
-    // Convert numeric fields to strings for Drizzle numeric columns
+    // Convert to strings for Drizzle numeric columns
     const dbData = {
         ...rawDataForDb,
         userId: user.id,
@@ -147,7 +144,7 @@ export async function submitReview(prevState: ReviewState, formData: FormData) {
 }
 
 // Update an existing review
-export async function updateReview(prevState: ReviewState, formData: FormData) {
+export async function updateReview(_prevState: ReviewState, formData: FormData) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -156,7 +153,6 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
     }
 
     const reviewId = formData.get("reviewId") as string;
-    const slug = formData.get("slug") as string;
 
     // Verify ownership
     const [existingReview] = await db
@@ -169,6 +165,8 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
         return { success: false, message: "Non puoi modificare questa recensione." };
     }
 
+    const slugValue = formData.get("slug") as string | null;
+
     const rawData = {
         fragranceId: formData.get("fragranceId"),
         rating: Number(formData.get("rating")),
@@ -179,30 +177,29 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
         seasonVote: formData.get("seasonVote") || undefined,
         batchCode: formData.get("batchCode") || undefined,
         productionDate: formData.get("productionDate") || undefined,
-        slug
+        slug: slugValue ?? undefined
     };
 
-    const validatedFields = ReviewSchema.safeParse(rawData);
+    const formFields = ReviewSchema.safeParse(rawData);
 
-    if (!validatedFields.success) {
+    if (!formFields.success) {
         return {
-            errors: validatedFields.error.flatten().fieldErrors,
+            errors: formFields.error.flatten().fieldErrors,
             message: "Controlla i campi inseriti.",
             success: false
         };
     }
 
-    // Moderate comment content if present
-    if (validatedFields.data.comment && validatedFields.data.comment.trim().length > 0) {
-        // Quick local filter
-        if (containsForbiddenWords(validatedFields.data.comment)) {
+    // Moderate comment if present
+    if (formFields.data.comment && formFields.data.comment.trim().length > 0) {
+        if (containsForbiddenWords(formFields.data.comment)) {
             return {
                 success: false,
                 message: "Il contenuto contiene linguaggio volgare o offensivo."
             };
         }
 
-        const moderationResult = await moderateContent(validatedFields.data.comment);
+        const moderationResult = await moderateContent(formFields.data.comment);
 
         if (moderationResult.flagged) {
             return {
@@ -212,8 +209,8 @@ export async function updateReview(prevState: ReviewState, formData: FormData) {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { slug: _slug, ...rawDataForDb } = validatedFields.data;
+    const { slug, ...rawDataForDb } = formFields.data;
+
 
     const dbData = {
         ...rawDataForDb,

@@ -1,7 +1,4 @@
-/**
- * Content Moderation using Google Gemini
- * Accurate multilingual moderation
- */
+// Gemini-based content moderation for Italian reviews
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -21,9 +18,7 @@ export type ModerationResult = {
     reason?: string;
 };
 
-/**
- * Check if content is appropriate using Google Gemini
- */
+
 export async function moderateContent(content: string): Promise<ModerationResult> {
     if (!content || content.trim().length === 0) {
         return { flagged: false, categories: {}, flaggedCategories: [] };
@@ -38,7 +33,7 @@ export async function moderateContent(content: string): Promise<ModerationResult
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Use gemini-2.0-flash as confirmed available
+        // Using gemini-2.5-flash for speed
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `Sei un moderatore di contenuti severo per recensioni di profumi. Analizza il seguente testo in italiano.
@@ -75,9 +70,8 @@ export async function moderateContent(content: string): Promise<ModerationResult
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
 
-        // Clean response if it contains markdown code blocks
+        // Gemini sometimes wraps JSON in markdown code blocks
         let jsonString = responseText.replace(/```json\n?|\n?```/g, "").trim();
-        // Remove typing if present (sometimes returns ```json ... ```) 
         jsonString = jsonString.replace(/^```/, "").replace(/```$/, "");
 
         const data = JSON.parse(jsonString);
@@ -100,25 +94,23 @@ export async function moderateContent(content: string): Promise<ModerationResult
 
     } catch (error) {
         console.error('Gemini Moderation error:', error);
-        // Fail open
+        // Fail open: don't block content if moderation fails
         return { flagged: false, categories: {}, flaggedCategories: [] };
     }
 }
 
-/**
- * Get a user-friendly message for flagged content
- */
+
 export function getModerationMessage(flaggedCategories: ModerationCategory[]): string {
     if (flaggedCategories.length === 0) {
         return "Il contenuto non è appropriato.";
     }
 
-    // Check for spam/relevance
+    // Spam/off-topic check
     if (flaggedCategories.includes('spam')) {
         return "Il contenuto non sembra pertinente ai profumi o non ha senso compiuto.";
     }
 
-    // Check for profanity
+    // Profanity check
     if (flaggedCategories.includes('profanity')) {
         return "Il contenuto contiene linguaggio volgare o offensivo.";
     }
