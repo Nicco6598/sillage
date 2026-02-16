@@ -8,6 +8,8 @@ import { db } from "@/lib/db";
 import { reviews, userCollection, userFavorites, fragrances, brands } from "@/lib/db-schema";
 import { eq, desc, sql, and } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 async function getUserStats(userId: string) {
     const [reviewCount] = await db
         .select({ count: sql<number>`count(*)` })

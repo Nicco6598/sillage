@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   images: {
@@ -10,11 +11,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Fix for Turbopack workspace root warning
-  experimental: {
-    turbo: {
-      root: ".",
-    },
+  turbopack: {
+    root: path.resolve(process.cwd()),
   },
 };
 

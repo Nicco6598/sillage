@@ -17,6 +17,8 @@ interface FragrancePageProps {
     params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function FragrancePage({ params }: FragrancePageProps) {
     const { slug } = await params;
     const fragrance = await getFragranceBySlug(slug);

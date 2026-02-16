@@ -15,6 +15,8 @@ interface ExplorePageProps {
     }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
     title: "Esplora Fragranze | SILLAGE",
     description: "Scopri oltre 24.000 fragranze. Filtra per note, accordi, brand e molto altro.",

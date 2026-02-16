@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react";
 import { getDatabaseStats, getFeaturedBrands } from "@/lib/fragrance-db";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // Fetch only lightweight data
   const [stats, featuredBrands] = await Promise.all([
