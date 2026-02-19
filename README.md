@@ -42,10 +42,10 @@
 
 ## 📸 Screenshots
 
-![Home Page Placeholder](https://placehold.co/1200x675/1a1a1a/ffffff?text=Home+Page+Screenshot)
+![Home Page Screenshot](./public/screenshots/home.png)
 *The immersive landing page with featured fragrances.*
 
-![Fragrance Detail Placeholder](https://placehold.co/1200x675/1a1a1a/ffffff?text=Fragrance+Detail+Screenshot)
+![Fragrance Detail Screenshot](./public/screenshots/detail.png)
 *Detailed fragrance analysis with olfactory pyramid and community stats.*
 
 ## 📋 Prerequisites
